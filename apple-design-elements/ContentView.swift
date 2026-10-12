@@ -48,6 +48,10 @@ struct ContentView: View {
                     TypographySpecimenSection()
                 }
 
+                Section("Stage 3 Color Semantics & Appearance") {
+                    ColorSemanticsSection()
+                }
+
                 Section("Baseline Visual Matrix") {
                     ForEach(assumptions) { assumption in
                         HStack(alignment: .firstTextBaseline) {
@@ -62,7 +66,7 @@ struct ContentView: View {
                 }
 
                 Section("Current Rule") {
-                    Text("Keep semantic text styles as default and treat custom typography as an explicit component contract.")
+                    Text("Use semantic typography and semantic color roles by default; fixed visual values in reusable UI require explicit justification.")
                 }
             }
             .navigationTitle("DesignSystemLab")
@@ -235,6 +239,111 @@ private struct FixedRampAntiPatternSpecimen: View {
     }
 }
 
+private struct ColorSemanticsSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Apple semantic colors (adaptive)")
+                .font(.headline)
+            AppleSemanticColorCard()
+
+            Divider()
+
+            Text("Hard-coded colors (intentional anti-pattern)")
+                .font(.headline)
+            HardCodedColorAntiPatternCard()
+
+            Text("Inspect in light/dark + increased contrast: semantic roles adapt while fixed values become brittle.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct AppleSemanticColorCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Semantic surface")
+                .font(.headline)
+                .foregroundStyle(.primary)
+
+            Text("This card uses system semantic foreground/background roles and should remain legible across appearance changes.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 10) {
+                SemanticSwatch(label: "Primary", fill: Color.primary)
+                SemanticSwatch(label: "Secondary", fill: Color.secondary)
+                SemanticSwatch(label: "Tint", fill: Color.accentColor)
+            }
+
+            Button("System action") {}
+                .buttonStyle(.borderedProminent)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private struct HardCodedColorAntiPatternCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Fixed palette")
+                .font(.headline)
+                .foregroundStyle(Color(red: 0.89, green: 0.95, blue: 1.0))
+
+            Text("These fixed values are intentionally brittle and may lose clarity in dark mode or increased contrast.")
+                .font(.subheadline)
+                .foregroundStyle(Color(red: 0.72, green: 0.83, blue: 0.95))
+
+            HStack(spacing: 10) {
+                SemanticSwatch(label: "Info", fill: Color(red: 0.22, green: 0.56, blue: 0.91))
+                SemanticSwatch(label: "Border", fill: Color(red: 0.19, green: 0.35, blue: 0.59))
+                SemanticSwatch(label: "Bg", fill: Color(red: 0.08, green: 0.16, blue: 0.28))
+            }
+
+            Text("Button look-alike")
+                .font(.caption.weight(.semibold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color(red: 0.09, green: 0.14, blue: 0.24), in: Capsule())
+                .foregroundStyle(.white)
+        }
+        .padding()
+        .background(Color(red: 0.06, green: 0.13, blue: 0.23), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(red: 0.16, green: 0.29, blue: 0.47), lineWidth: 1)
+        )
+    }
+}
+
+private struct SemanticSwatch: View {
+    let label: String
+    let fill: Color
+
+    var body: some View {
+        VStack(spacing: 4) {
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(fill)
+                .frame(width: 42, height: 26)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .stroke(Color(uiColor: .separator), lineWidth: 0.5)
+                )
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+    }
+}
+
 #Preview("Default") {
     ContentView()
 }
@@ -242,4 +351,9 @@ private struct FixedRampAntiPatternSpecimen: View {
 #Preview("Accessibility 1") {
     ContentView()
         .dynamicTypeSize(.accessibility1)
+}
+
+#Preview("Dark Mode") {
+    ContentView()
+        .preferredColorScheme(.dark)
 }
