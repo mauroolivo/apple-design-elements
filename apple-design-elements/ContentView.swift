@@ -60,6 +60,10 @@ struct ContentView: View {
                     ControlsBehaviorSection()
                 }
 
+                Section("Stage 6 Iconography & Symbol Behavior") {
+                    IconographySection()
+                }
+
                 Section("Baseline Visual Matrix") {
                     ForEach(assumptions) { assumption in
                         HStack(alignment: .firstTextBaseline) {
@@ -74,7 +78,7 @@ struct ContentView: View {
                 }
 
                 Section("Current Rule") {
-                    Text("Use semantic typography, color roles, system materials, and native controls by default; fixed visual values or custom control behavior require explicit justification.")
+                    Text("Use semantic typography, color roles, system materials, native controls, and SF Symbols semantics by default; fixed visual values or custom behavior require explicit justification.")
                 }
             }
             .navigationTitle("DesignSystemLab")
@@ -579,6 +583,154 @@ private struct ControlBehaviorChecklist: View {
                 .font(.footnote)
         }
         .foregroundStyle(.secondary)
+    }
+}
+
+private struct IconographySection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("SF Symbols rendering modes and scales")
+                .font(.headline)
+            SymbolRenderingModesCard()
+
+            Divider()
+
+            Text("Text alignment + custom icon pairing")
+                .font(.headline)
+            SymbolAlignmentCard()
+
+            Divider()
+
+            Text("Directional symbols and RTL sensitivity")
+                .font(.headline)
+            RTLSymbolComparisonCard()
+
+            Text("Anti-pattern note: fixed raster-like icon sizing and direction-insensitive arrows become fragile across Dynamic Type and RTL.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct SymbolRenderingModesCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Native symbol semantics")
+                .font(.subheadline.weight(.semibold))
+
+            HStack(spacing: 16) {
+                SymbolSample(label: "Monochrome", imageName: "bell.badge.fill")
+                SymbolSample(label: "Hierarchical", imageName: "bell.badge.fill", mode: .hierarchical)
+                SymbolSample(label: "Palette", imageName: "bell.badge.fill", mode: .palette)
+            }
+
+            Text("Use rendering modes and semantic tinting before exporting custom icon sets.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct SymbolAlignmentCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("System symbol aligned to text metrics", systemImage: "bookmark.circle.fill")
+                .font(.headline)
+
+            HStack(spacing: 10) {
+                CourseCreatedBadgeIcon()
+                    .frame(width: 22, height: 22)
+                    .accessibilityHidden(true)
+                Text("Course-created icon shape paired with body text")
+                    .font(.body)
+            }
+
+            HStack(spacing: 10) {
+                Image(systemName: "bookmark.circle.fill")
+                    .resizable()
+                    .frame(width: 22, height: 22)
+                Text("Anti-pattern: resizable symbol detached from font metrics")
+                    .font(.system(size: 12, weight: .regular))
+            }
+            .foregroundStyle(.secondary)
+
+            Text("Prefer `font`-driven sizing for symbols in text contexts.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private struct RTLSymbolComparisonCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Directional semantics")
+                .font(.subheadline.weight(.semibold))
+
+            HStack(spacing: 12) {
+                Label("Forward semantic", systemImage: "chevron.forward")
+                    .font(.subheadline)
+                Label("Fixed right arrow", systemImage: "arrow.right")
+                    .font(.subheadline)
+            }
+
+            Text("In RTL, semantic directions are preferred because they adapt with layout direction. Fixed absolute arrows often require manual correction.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct SymbolSample: View {
+    let label: String
+    let imageName: String
+    var mode: SymbolRenderingMode? = nil
+
+    var body: some View {
+        VStack(spacing: 6) {
+            if let mode {
+                Image(systemName: imageName)
+                    .font(.title2)
+                    .symbolRenderingMode(mode)
+                    .foregroundStyle(.blue, .orange)
+            } else {
+                Image(systemName: imageName)
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+            }
+
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct CourseCreatedBadgeIcon: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(.tint.opacity(0.18))
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .stroke(.tint, lineWidth: 1)
+            Path { path in
+                path.move(to: CGPoint(x: 5, y: 11))
+                path.addLine(to: CGPoint(x: 9, y: 15))
+                path.addLine(to: CGPoint(x: 17, y: 7))
+            }
+            .stroke(.tint, style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+        }
     }
 }
 

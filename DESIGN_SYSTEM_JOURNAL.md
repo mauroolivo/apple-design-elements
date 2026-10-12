@@ -335,3 +335,57 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 5 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 6 - Iconography, SF Symbols, assets, and imagery
+
+Date: 2026-10-12
+
+### Goal and design-system mental model
+Treat iconography as semantic communication tied to platform behavior: symbols should adapt with typography, direction, and rendering context before custom icon sets are introduced.
+
+### Apple baseline / reference behavior
+- Source used: HIG icons guidance and platform iconography conventions.
+- Source used: SF Symbols official resources for variants and rendering behaviors.
+- Source used: SwiftUI `Image`, `Label`, and `SymbolRenderingMode` APIs for practical implementation boundaries.
+
+### Design question and prediction
+- Question: Where do SF Symbols cover system needs, and which behaviors are easy to break with custom or hard-coded icon treatment?
+- Prediction: SF Symbols handle most semantic/control contexts reliably; fixed-size/resizable misuse and absolute-direction arrows are common failure modes.
+
+### Minimal hands-on implementation
+- Added Stage 6 section in `apple-design-elements/ContentView.swift`:
+  - `SymbolRenderingModesCard`: monochrome, hierarchical, and palette symbol rendering comparison.
+  - `SymbolAlignmentCard`: symbol-text pairing baseline plus a deliberate resizable anti-pattern.
+  - `RTLSymbolComparisonCard`: semantic directional symbol (`chevron.forward`) vs fixed absolute arrow (`arrow.right`).
+  - `CourseCreatedBadgeIcon`: course-created vector-like icon shape to compare custom icon integration behavior.
+
+### Figma/reference comparison or visual inspection
+- No inspectable official Apple Figma file is available in this workspace.
+- Stage 6 is grounded in Apple docs/resources and course-authored icon comparison specimens.
+- No icon metrics are attributed to Apple kit measurements.
+
+### Accessibility and adaptation checks
+- `Label`-based symbol usage preserves icon+text semantics and trait composition by default.
+- Symbol rendering modes keep icon meaning while adapting visual treatment semantically.
+- Directional semantics (`forward`) are preferred over absolute arrow directions in RTL-sensitive flows.
+
+### Trade-offs and design-system rule
+- Trade-off: custom icons increase brand uniqueness, but they require explicit scaling/tint/RTL governance and maintenance effort.
+- Rule: choose SF Symbols first for product UI; adopt custom icons only for missing domain meaning and document adaptation contracts.
+
+### Journal entry
+Stage 6 decisions:
+1. SF Symbols remain the default iconography layer for reusable components.
+2. Symbol sizing in text contexts should be font-driven, not arbitrary frame-driven, unless documented exception applies.
+3. Direction-aware symbols are required in navigation/action affordances that must support RTL.
+4. Custom icons require explicit semantic naming and adaptation checks before entering shared APIs.
+
+Verification:
+- Local build after Stage 6 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Visual checks available through default, accessibility-size, and dark-mode previews.
+
+### Stop and wait for `next`
+Stage 6 is complete. Continue only after receiving `next`.
