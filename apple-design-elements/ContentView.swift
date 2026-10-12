@@ -8,7 +8,16 @@ struct LabEnvironmentAssumption: Identifiable {
     let value: String
 }
 
+private enum LabCoursePart: String, CaseIterable, Identifiable {
+    case partI = "Part I"
+    case partII = "Part II"
+
+    var id: String { rawValue }
+}
+
 struct ContentView: View {
+    @State private var selectedPart: LabCoursePart = .partI
+
     private let assumptions: [LabEnvironmentAssumption] = [
         .init(key: "Simulator model", value: "iPhone 18 Pro"),
         .init(key: "Simulator OS", value: "iOS 27.0"),
@@ -22,66 +31,89 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Stage 0 Laboratory") {
-                    Label("DesignSystemLab bootstrap", systemImage: "hammer")
-                    Label("Apple references inventory started", systemImage: "book")
-                    Label("Figma inspection unavailable", systemImage: "exclamationmark.triangle")
-                }
-
-                Section("Stage 1 Native vs Brand-Heavy") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Apple-native baseline")
-                            .font(.headline)
-                        AppleNativeExampleCard()
-                    }
-                    .padding(.vertical, 4)
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Brand-heavy mockup (intentionally flawed)")
-                            .font(.headline)
-                        BrandHeavyExampleCard()
-                    }
-                    .padding(.vertical, 4)
-                }
-
-                Section("Stage 2 Typography Specimen") {
-                    TypographySpecimenSection()
-                }
-
-                Section("Stage 3 Color Semantics & Appearance") {
-                    ColorSemanticsSection()
-                }
-
-                Section("Stage 4 Materials, Surfaces & Depth") {
-                    MaterialSurfacesSection()
-                }
-
-                Section("Stage 5 Controls & Behavioral Contracts") {
-                    ControlsBehaviorSection()
-                }
-
-                Section("Stage 6 Iconography & Symbol Behavior") {
-                    IconographySection()
-                }
-
-                Section("Baseline Visual Matrix") {
-                    ForEach(assumptions) { assumption in
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(assumption.key)
-                                .foregroundStyle(.secondary)
-                            Spacer(minLength: 12)
-                            Text(assumption.value)
-                                .multilineTextAlignment(.trailing)
+                Section("Course Part") {
+                    Picker("Course Part", selection: $selectedPart) {
+                        ForEach(LabCoursePart.allCases) { part in
+                            Text(part.rawValue).tag(part)
                         }
-                        .accessibilityElement(children: .combine)
                     }
+                    .pickerStyle(.segmented)
                 }
 
-                Section("Current Rule") {
-                    Text("Use semantic typography, color roles, system materials, native controls, and SF Symbols semantics by default; fixed visual values or custom behavior require explicit justification.")
+                if selectedPart == .partI {
+                    PartIFoundationsScreen(assumptions: assumptions)
+                } else {
+                    PartIICustomSystemScreen(assumptions: assumptions)
                 }
             }
             .navigationTitle("DesignSystemLab")
+        }
+    }
+}
+
+private struct PartIFoundationsScreen: View {
+    let assumptions: [LabEnvironmentAssumption]
+
+    var body: some View {
+        Group {
+            Section("Stage 0 Laboratory") {
+                Label("DesignSystemLab bootstrap", systemImage: "hammer")
+                Label("Apple references inventory started", systemImage: "book")
+                Label("Figma inspection unavailable", systemImage: "exclamationmark.triangle")
+            }
+
+            Section("Stage 1 Native vs Brand-Heavy") {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Apple-native baseline")
+                        .font(.headline)
+                    AppleNativeExampleCard()
+                }
+                .padding(.vertical, 4)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Brand-heavy mockup (intentionally flawed)")
+                        .font(.headline)
+                    BrandHeavyExampleCard()
+                }
+                .padding(.vertical, 4)
+            }
+
+            Section("Stage 2 Typography Specimen") {
+                TypographySpecimenSection()
+            }
+
+            Section("Stage 3 Color Semantics & Appearance") {
+                ColorSemanticsSection()
+            }
+
+            Section("Stage 4 Materials, Surfaces & Depth") {
+                MaterialSurfacesSection()
+            }
+
+            Section("Stage 5 Controls & Behavioral Contracts") {
+                ControlsBehaviorSection()
+            }
+
+            Section("Stage 6 Iconography & Symbol Behavior") {
+                IconographySection()
+            }
+
+            Section("Baseline Visual Matrix") {
+                ForEach(assumptions) { assumption in
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(assumption.key)
+                            .foregroundStyle(.secondary)
+                        Spacer(minLength: 12)
+                        Text(assumption.value)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            }
+
+            Section("Current Rule") {
+                Text("Use semantic typography, color roles, system materials, native controls, and SF Symbols semantics by default; fixed visual values or custom behavior require explicit justification.")
+            }
         }
     }
 }
@@ -622,7 +654,7 @@ private struct SymbolRenderingModesCard: View {
             HStack(spacing: 16) {
                 SymbolSample(label: "Monochrome", imageName: "bell.badge.fill")
                 SymbolSample(label: "Hierarchical", imageName: "bell.badge.fill", mode: .hierarchical)
-                SymbolSample(label: "Palette", imageName: "bell.badge.fill", mode: .palette)
+                SymbolSample(label: "Palette", imageName: "bell.badge.fill", mode: .multicolor)
             }
 
             Text("Use rendering modes and semantic tinting before exporting custom icon sets.")

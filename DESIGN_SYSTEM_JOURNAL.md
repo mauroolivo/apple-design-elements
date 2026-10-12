@@ -389,3 +389,56 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 6 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 7 - Design-system architecture and ownership
+
+Date: 2026-10-12
+
+### Goal and design-system mental model
+Define ownership and architecture boundaries with minimal abstraction: isolate only what is stable, and keep volatile experimentation local to preserve iteration speed.
+
+### Apple baseline / reference behavior
+- Source used: Swift Package Manager and Xcode package-integration docs as the baseline for boundary decisions.
+- Source used: SwiftUI preview documentation to assess development-loop impact of module boundaries.
+- Stage baseline from prior labs: system semantics remain primary dependencies for foundations/components.
+
+### Design question and prediction
+- Question: Should we move to a local `DesignSystem` package now, or keep architecture in the app target until token/component contracts stabilize?
+- Prediction: Keep Stage 7 local. Premature modularization adds ceremony before API boundaries are evidence-backed.
+
+### Minimal hands-on implementation
+- Added Stage 7 section in `apple-design-elements/ContentView.swift`:
+  - `DependencyGraphCard`: explicit current dependency graph.
+  - `PackagingDecisionCard`: package-now vs package-later rationale and escalation triggers.
+  - `PublicAPIProposalCard`: minimal proposed foundations/components surface (naming targets only).
+- Updated current rule text to reinforce architecture growth only after ownership clarity.
+
+### Figma/reference comparison or visual inspection
+- No inspectable official Apple Figma file is available in this workspace.
+- Stage 7 is architecture/governance-focused and grounded in Apple platform/tooling documentation, not visual kit measurements.
+
+### Accessibility and adaptation checks
+- No direct new interaction component introduced; accessibility impact is architectural.
+- Positive impact: delaying extraction avoids locking in brittle APIs that could constrain future accessibility semantics.
+- Stage implication: boundary decisions are treated as quality gates for adaptation and behavior ownership.
+
+### Trade-offs and design-system rule
+- Trade-off: early package extraction can improve boundary enforcement, but may reduce learning velocity and force unstable APIs.
+- Rule: extract a package only when repeated cross-feature usage and stable semantic contracts justify public API cost.
+
+### Journal entry
+Stage 7 decisions:
+1. Keep the lab in one app target for now; no package extraction yet.
+2. Track a minimal proposed public API, but do not codify it until Stage 8+ token/component pressure appears repeatedly.
+3. Use explicit escalation triggers for modularization (duplication, unstable call sites, ownership ambiguity).
+4. Architecture changes require evidence from component usage, not aesthetics or speculative reuse.
+
+Verification:
+- Local build after Stage 7 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Stage 7 visual artifact is an architecture governance section in the lab UI.
+
+### Stop and wait for `next`
+Stage 7 is complete. Continue only after receiving `next`.
