@@ -52,6 +52,10 @@ struct ContentView: View {
                     ColorSemanticsSection()
                 }
 
+                Section("Stage 4 Materials, Surfaces & Depth") {
+                    MaterialSurfacesSection()
+                }
+
                 Section("Baseline Visual Matrix") {
                     ForEach(assumptions) { assumption in
                         HStack(alignment: .firstTextBaseline) {
@@ -66,7 +70,7 @@ struct ContentView: View {
                 }
 
                 Section("Current Rule") {
-                    Text("Use semantic typography and semantic color roles by default; fixed visual values in reusable UI require explicit justification.")
+                    Text("Use semantic typography, color roles, and system materials by default; fixed visual values in reusable UI require explicit justification.")
                 }
             }
             .navigationTitle("DesignSystemLab")
@@ -341,6 +345,125 @@ private struct SemanticSwatch: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
+    }
+}
+
+private struct MaterialSurfacesSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Apple material baseline (context-aware)")
+                .font(.headline)
+            AppleMaterialSurfaceCard()
+
+            Divider()
+
+            Text("Brand blur-stack anti-pattern (intentional)")
+                .font(.headline)
+            FragileCustomSurfaceCard()
+
+            Text("Validate in light/dark, scrolling, and reduced transparency settings: material adapts contextually while custom blur stacks drift.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct AppleMaterialSurfaceCard: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.orange.opacity(0.45), Color.pink.opacity(0.45), Color.blue.opacity(0.45)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("System material surface")
+                    .font(.headline)
+                Text("This panel relies on `.regularMaterial` for contextual depth while preserving platform behavior.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                HStack(spacing: 8) {
+                    MaterialChip(label: "Ultra Thin", material: .ultraThinMaterial)
+                    MaterialChip(label: "Regular", material: .regularMaterial)
+                    MaterialChip(label: "Thick", material: .thickMaterial)
+                }
+            }
+            .padding()
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color(uiColor: .separator), lineWidth: 1)
+            )
+            .padding(10)
+        }
+        .frame(height: 190)
+    }
+}
+
+private struct FragileCustomSurfaceCard: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(red: 0.17, green: 0.23, blue: 0.36), Color(red: 0.08, green: 0.11, blue: 0.18)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Fixed faux-glass")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+
+                Text("Multiple hard-coded opacities and blur radii mimic depth at one state but are intentionally fragile.")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.white.opacity(0.78))
+
+                HStack(spacing: 8) {
+                    Text("Layer A")
+                    Text("Layer B")
+                    Text("Layer C")
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.white.opacity(0.28), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.34), radius: 16, x: 0, y: 8)
+            .blur(radius: 0.25)
+            .padding(10)
+        }
+        .frame(height: 190)
+    }
+}
+
+private struct MaterialChip: View {
+    let label: String
+    let material: Material
+
+    var body: some View {
+        Text(label)
+            .font(.caption2.weight(.semibold))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(material, in: Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(Color(uiColor: .separator), lineWidth: 0.5)
+            )
     }
 }
 

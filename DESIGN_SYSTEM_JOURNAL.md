@@ -227,3 +227,57 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 3 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 4 - Materials, surfaces, depth, and visual hierarchy
+
+Date: 2026-10-12
+
+### Goal and design-system mental model
+Treat material and depth as behavioral context signals, not static decoration: system materials should remain the default substrate for layered UI, while branded surfaces are constrained extensions.
+
+### Apple baseline / reference behavior
+- Source used: HIG guidance for translucency/blur and layered visual hierarchy.
+- Source used: SwiftUI `Material` semantics and shape-scoped background APIs.
+- Source used: UIKit `UIVisualEffectView` docs as the boundary reference for blur behavior outside pure SwiftUI.
+
+### Design question and prediction
+- Question: Does platform material preserve depth/legibility across appearance contexts better than a custom fixed blur stack?
+- Prediction: Yes. System material should remain resilient under light/dark and scrolling context changes, while hard-coded blur/opacity layers will drift and require fragile tuning.
+
+### Minimal hands-on implementation
+- Added a Stage 4 section in `apple-design-elements/ContentView.swift`:
+  - `AppleMaterialSurfaceCard`: contextual gradient backdrop + system material surface and separator-aware border.
+  - `MaterialChip`: quick sample of multiple material thicknesses (`ultraThin`, `regular`, `thick`).
+  - `FragileCustomSurfaceCard`: intentionally brittle faux-glass stack using fixed opacity/blur/shadow values.
+- Updated the current lab rule to include system materials as first-class defaults.
+
+### Figma/reference comparison or visual inspection
+- No inspectable official Apple Figma file is available in this workspace.
+- Stage 4 remains Apple-doc-grounded with course-authored comparative specimens.
+- No material radius/opacity/blur value is claimed as an official Apple kit measurement.
+
+### Accessibility and adaptation checks
+- Material baseline remains semantically integrated with system foreground/background behavior.
+- Custom blur stack intentionally demonstrates risk under appearance and transparency preference changes.
+- Increased-contrast and reduced-transparency remain required simulator-level checks in the visual matrix workflow.
+
+### Trade-offs and design-system rule
+- Trade-off: bespoke blur stacks can offer strong brand signatures in one context but introduce high adaptation and maintenance cost.
+- Rule: prefer system materials for reusable surfaces; branded depth effects must define fallback behavior and pass accessibility environment checks before reuse.
+
+### Journal entry
+Stage 4 decisions:
+1. Use system materials as the default abstraction for layered surfaces.
+2. Encode brand surfaces semantically, not as one-off blur recipes.
+3. Require reduced-transparency and contrast fallback notes for non-system surface treatments.
+4. Treat depth hierarchy as interaction clarity, not visual-only styling.
+
+Verification:
+- Local build after Stage 4 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Visual checks available through default, accessibility-size, and dark-mode previews.
+
+### Stop and wait for `next`
+Stage 4 is complete. Continue only after receiving `next`.
