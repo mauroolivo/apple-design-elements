@@ -281,3 +281,57 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 4 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 5 - Apple controls and behavioral contracts
+
+Date: 2026-10-12
+
+### Goal and design-system mental model
+Treat controls as behavioral contracts first: native controls carry semantics, accessibility, and platform evolution that custom visuals should preserve by default.
+
+### Apple baseline / reference behavior
+- Source used: HIG controls guidance for component expectations and familiar interaction models.
+- Source used: SwiftUI `Button`, `ButtonStyle`, and `ControlSize` APIs for native customization boundaries.
+- Source used: SwiftUI `Toggle` for state-driven behavior checks inside the lab.
+
+### Design question and prediction
+- Question: How much customization can we apply while retaining native behavior, and what breaks when we replace controls with visual look-alikes?
+- Prediction: Native control styling preserves semantics with minimal risk; custom look-alikes require manual parity work and are easy to under-specify.
+
+### Minimal hands-on implementation
+- Added Stage 5 section in `apple-design-elements/ContentView.swift`:
+  - `NativeButtonContractCard`: styled native `Button` with disabled state and control sizing.
+  - `CustomButtonContractCard`: intentionally risky custom look-alike using `onTapGesture`.
+  - `ControlBehaviorChecklist`: explicit inventory of behaviors required when replacing native controls.
+- Added a shared toggle to disable both actions and reveal behavior differences.
+
+### Figma/reference comparison or visual inspection
+- No inspectable official Apple Figma file is available in this workspace.
+- Stage 5 compares Apple-native behavioral semantics against a course-authored custom control anti-pattern.
+- No control metrics are attributed to Apple kit measurements.
+
+### Accessibility and adaptation checks
+- Native button keeps accessibility traits and disabled-state semantics automatically.
+- Custom look-alike is intentionally incomplete and demonstrates semantic debt risk.
+- Stage implication: custom controls must prove VoiceOver, focus, and state parity before reuse approval.
+
+### Trade-offs and design-system rule
+- Trade-off: full custom controls can unlock distinct branding, but behavior parity cost is high and easy to underestimate.
+- Rule: style native controls first; replace only with evidence-backed need and a written parity checklist covering semantics, states, and accessibility.
+
+### Journal entry
+Stage 5 decisions:
+1. Native controls remain default for reusable interactions unless a requirement is not achievable via styling/composition.
+2. Custom control APIs must include explicit state modeling (pressed, disabled, focus, role).
+3. Accessibility parity is an acceptance gate, not a post-hoc fix.
+4. Behavior checklists become required documentation for any control replacement proposal.
+
+Verification:
+- Local build after Stage 5 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Visual/behavior checks available through default, accessibility-size, and dark-mode previews.
+
+### Stop and wait for `next`
+Stage 5 is complete. Continue only after receiving `next`.

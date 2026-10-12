@@ -56,6 +56,10 @@ struct ContentView: View {
                     MaterialSurfacesSection()
                 }
 
+                Section("Stage 5 Controls & Behavioral Contracts") {
+                    ControlsBehaviorSection()
+                }
+
                 Section("Baseline Visual Matrix") {
                     ForEach(assumptions) { assumption in
                         HStack(alignment: .firstTextBaseline) {
@@ -70,7 +74,7 @@ struct ContentView: View {
                 }
 
                 Section("Current Rule") {
-                    Text("Use semantic typography, color roles, and system materials by default; fixed visual values in reusable UI require explicit justification.")
+                    Text("Use semantic typography, color roles, system materials, and native controls by default; fixed visual values or custom control behavior require explicit justification.")
                 }
             }
             .navigationTitle("DesignSystemLab")
@@ -464,6 +468,117 @@ private struct MaterialChip: View {
                 Capsule()
                     .stroke(Color(uiColor: .separator), lineWidth: 0.5)
             )
+    }
+}
+
+private struct ControlsBehaviorSection: View {
+    @State private var nativeTapCount = 0
+    @State private var customTapCount = 0
+    @State private var disableActions = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Toggle("Disable both actions", isOn: $disableActions)
+
+            Text("Customized native Button baseline")
+                .font(.headline)
+            NativeButtonContractCard(
+                tapCount: nativeTapCount,
+                isDisabled: disableActions,
+                action: { nativeTapCount += 1 }
+            )
+
+            Divider()
+
+            Text("Fully custom look-alike (intentional risk)")
+                .font(.headline)
+            CustomButtonContractCard(
+                tapCount: customTapCount,
+                isDisabled: disableActions,
+                action: { customTapCount += 1 }
+            )
+
+            ControlBehaviorChecklist()
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct NativeButtonContractCard: View {
+    let tapCount: Int
+    let isDisabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Native semantics retained")
+                .font(.subheadline.weight(.semibold))
+
+            Button("Review details (\(tapCount))", action: action)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(isDisabled)
+
+            Text("System control keeps traits, focus behavior, disabled semantics, and platform updates.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct CustomButtonContractCard: View {
+    let tapCount: Int
+    let isDisabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Custom surface mimicking a button")
+                .font(.subheadline.weight(.semibold))
+
+            Text("Review details (\(tapCount))")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(isDisabled ? Color.gray.opacity(0.35) : Color(red: 0.10, green: 0.34, blue: 0.78), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .foregroundStyle(.white)
+                .onTapGesture {
+                    guard !isDisabled else { return }
+                    action()
+                }
+
+            Text("Deliberate anti-pattern: this look-alike must manually restore semantics, states, and accessibility behavior.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private struct ControlBehaviorChecklist: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Behavior inventory for custom replacements")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            Label("Button role and VoiceOver traits", systemImage: "checkmark.circle")
+                .font(.footnote)
+            Label("Pressed, disabled, and focus states", systemImage: "checkmark.circle")
+                .font(.footnote)
+            Label("Keyboard/pointer interactions where applicable", systemImage: "checkmark.circle")
+                .font(.footnote)
+            Label("Future platform behavior updates", systemImage: "checkmark.circle")
+                .font(.footnote)
+        }
+        .foregroundStyle(.secondary)
     }
 }
 
