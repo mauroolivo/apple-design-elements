@@ -13,8 +13,11 @@ struct PartIICustomSystemScreen: View {
                 TokenModelingSection()
             }
 
+            Section("Stage 9 Themes & Environment Propagation") {
+                ThemePropagationSection()
+            }
+
             Section("Part II Roadmap") {
-                Label("Stage 9 - Themes and environment propagation", systemImage: "paintpalette")
                 Label("Stage 10 - Figma translation contract", systemImage: "square.and.pencil")
                 Label("Stage 11 - Visual fidelity and regression", systemImage: "photo.on.rectangle")
             }
@@ -33,8 +36,158 @@ struct PartIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Model primitive, semantic, and component tokens separately; brand decisions should update reusable UI from one source without rewriting component internals.")
+                Text("Model primitive, semantic, and component tokens separately, then resolve theme variants through environment propagation so shared UI adapts without prop drilling.")
             }
+        }
+    }
+}
+
+private struct ThemePropagationSection: View {
+    @State private var brandDecision: DSBrandDecision = .ocean
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Picker("Theme brand", selection: $brandDecision) {
+                ForEach(DSBrandDecision.allCases) { decision in
+                    Text(decision.rawValue).tag(decision)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            ThemeEnvironmentMatrixCard(
+                colorScheme: colorScheme,
+                colorSchemeContrast: colorSchemeContrast,
+                dynamicTypeSize: dynamicTypeSize
+            )
+
+            Divider()
+
+            Text("Environment-injected themed components")
+                .font(.headline)
+            EnvironmentTokenShowcase()
+                .dsTheme(brandDecision)
+
+            Divider()
+
+            Text("Prop-drilling anti-pattern")
+                .font(.headline)
+            PropDrillingAntiPatternCard(brandDecision: brandDecision)
+
+            Text("Stage 9 rule: resolve tokens at the theme boundary and inject through environment values so subtrees consume semantics directly.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct ThemeEnvironmentMatrixCard: View {
+    let colorScheme: ColorScheme
+    let colorSchemeContrast: ColorSchemeContrast
+    let dynamicTypeSize: DynamicTypeSize
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Resolved environment inputs")
+                .font(.subheadline.weight(.semibold))
+
+            ThemeEnvironmentRow(label: "Color scheme", value: colorScheme == .dark ? "Dark" : "Light")
+            ThemeEnvironmentRow(label: "Contrast", value: colorSchemeContrast == .increased ? "Increased" : "Standard")
+            ThemeEnvironmentRow(label: "Dynamic Type", value: dynamicTypeSize.description)
+
+            Text("These values become theme inputs; tokens should resolve once near the boundary, not repeatedly inside every component.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct ThemeEnvironmentRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 12)
+            Text(value)
+                .fontWeight(.medium)
+        }
+        .font(.footnote)
+    }
+}
+
+private struct EnvironmentTokenShowcase: View {
+    @Environment(\.dsTokens) private var tokenBundle
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: tokenBundle.semantics.spacing.stack) {
+            DSTokenCard(tokenBundle: tokenBundle)
+
+            HStack(spacing: tokenBundle.semantics.spacing.inline) {
+                DSTokenBadge(text: "Env-propagated", tokenBundle: tokenBundle)
+                DSTokenButton(title: "Themed action", tokenBundle: tokenBundle)
+            }
+        }
+    }
+}
+
+private struct PropDrillingAntiPatternCard: View {
+    let brandDecision: DSBrandDecision
+
+    var body: some View {
+        let tokenBundle = DSTokenBundle.make(for: brandDecision)
+
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Manual token threading")
+                .font(.subheadline.weight(.semibold))
+
+            Text("`Parent -> Section -> Row -> Leaf(tokenBundle:)` scales poorly because every level receives design data it does not own.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Parent(tokenBundle)")
+                Text("  -> MidLevel(tokenBundle)")
+                Text("     -> Row(tokenBundle)")
+                Text("        -> LeafButton(tokenBundle)")
+            }
+            .font(.system(.caption, design: .monospaced))
+            .foregroundStyle(.secondary)
+
+            DSTokenButton(title: "Still works, but tightly coupled", tokenBundle: tokenBundle)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private extension DynamicTypeSize {
+    var description: String {
+        switch self {
+        case .xSmall: return "xSmall"
+        case .small: return "small"
+        case .medium: return "medium"
+        case .large: return "large"
+        case .xLarge: return "xLarge"
+        case .xxLarge: return "xxLarge"
+        case .xxxLarge: return "xxxLarge"
+        case .accessibility1: return "accessibility1"
+        case .accessibility2: return "accessibility2"
+        case .accessibility3: return "accessibility3"
+        case .accessibility4: return "accessibility4"
+        case .accessibility5: return "accessibility5"
+        @unknown default: return "unknown"
         }
     }
 }

@@ -503,3 +503,62 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 8 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 9 - Themes and environment propagation
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Resolve theme variants at a boundary using runtime environment inputs, then propagate tokens through environment values instead of manually threading design data through unrelated view layers.
+
+### Apple baseline / reference behavior
+- Source used: SwiftUI `EnvironmentValues`, `EnvironmentKey`, and `@Environment` propagation model.
+- Source used: SwiftUI environment signals (`colorScheme`, `colorSchemeContrast`, `dynamicTypeSize`) as runtime adaptation inputs.
+- Source used: prior token modeling from Stage 8 as the typed foundation for theme resolution.
+
+### Design question and prediction
+- Question: Should themed tokens be passed manually through each view layer, or injected once and consumed where needed?
+- Prediction: Boundary resolution + environment injection reduces coupling and keeps component APIs focused on behavior, not token plumbing.
+
+### Minimal hands-on implementation
+- Extended `apple-design-elements/DSTokens.swift` with Stage 9 types and propagation support:
+  - `DSThemeInput`
+  - `DSTokenBundle.make(for input: DSThemeInput)`
+  - `EnvironmentValues.dsTokens` via custom `EnvironmentKey`
+  - `DSThemeProvider` to resolve and inject tokens at subtree boundaries
+- Extended `apple-design-elements/PartIICustomSystemScreen.swift` with Stage 9 lab views:
+  - `ThemePropagationSection`
+  - `ThemeEnvironmentMatrixCard`
+  - `EnvironmentTokenShowcase`
+  - `PropDrillingAntiPatternCard`
+- Updated Part II current rule text to include environment propagation guidance.
+
+### Figma/reference comparison or visual inspection
+- No inspectable official Apple Figma file is available in this workspace.
+- Stage 9 is implementation-architecture focused and grounded in Apple runtime/environment APIs, not Figma measurement extraction.
+
+### Accessibility and adaptation checks
+- Theme resolution now reacts to runtime environment signals for contrast and Dynamic Type sizing categories.
+- Stage 9 token resolution applies mild spacing and border/action adjustments for accessibility-context resilience.
+- Product brand choice remains a narrow input; system adaptation signals continue to influence final token output.
+
+### Trade-offs and design-system rule
+- Trade-off: custom environment keys add one additional abstraction layer, but reduce repetitive API plumbing and ownership confusion.
+- Rule: resolve token bundles at theme boundaries and inject via environment for shared subtrees; keep manual token parameters for local, explicit overrides only.
+
+### Journal entry
+Stage 9 decisions:
+1. Introduce a typed theme input boundary that combines brand and runtime adaptation signals.
+2. Use `EnvironmentValues` for token propagation to reduce non-owning parameter threading.
+3. Keep semantic derivation from Apple-owned roles even when brand variants are active.
+4. Preserve prop-drilling as a documented anti-pattern specimen for future article evidence.
+
+Verification:
+- Local build after Stage 9 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Stage 9 specimen now exposes environment inputs and compares environment-propagated theming against manual threading.
+
+### Stop and wait for `next`
+Stage 9 is complete. Continue only after receiving `next`.

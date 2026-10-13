@@ -1,5 +1,12 @@
 import SwiftUI
 
+struct DSThemeInput {
+    let brandDecision: DSBrandDecision
+    let colorScheme: ColorScheme
+    let colorSchemeContrast: ColorSchemeContrast
+    let dynamicTypeSize: DynamicTypeSize
+}
+
 enum DSBrandDecision: String, CaseIterable, Identifiable {
     case ocean = "Ocean"
     case plum = "Plum"
@@ -17,6 +24,100 @@ struct DSTokenBundle {
         let semantics = DSSemanticTokens.make(from: primitives)
         let components = DSComponentTokens.make(from: semantics)
         return Self(primitives: primitives, semantics: semantics, components: components)
+    }
+
+    static func make(for input: DSThemeInput) -> Self {
+        let base = make(for: input.brandDecision)
+        let isAccessibilitySize = input.dynamicTypeSize.isAccessibilitySize
+        let isHighContrast = input.colorSchemeContrast == .increased
+        let isDark = input.colorScheme == .dark
+
+        let semanticSpacing = DSSemanticSpacing(
+            stack: isAccessibilitySize ? base.semantics.spacing.stack + 2 : base.semantics.spacing.stack,
+            inline: base.semantics.spacing.inline,
+            cardPadding: isAccessibilitySize ? base.semantics.spacing.cardPadding + 2 : base.semantics.spacing.cardPadding
+        )
+
+        let semanticSurfaces = DSSemanticSurfaces(
+            primary: base.semantics.surfaces.primary,
+            accent: isDark ? base.primitives.brand.accent.opacity(0.32) : base.primitives.brand.accentSoft
+        )
+
+        let semanticActions = DSSemanticActions(
+            primary: isHighContrast ? base.primitives.brand.accentPressed : base.semantics.actions.primary,
+            pressed: base.semantics.actions.pressed
+        )
+
+        let semanticBorders = DSSemanticBorders(
+            subtle: base.semantics.borders.subtle,
+            width: isHighContrast ? max(2, base.semantics.borders.width) : base.semantics.borders.width
+        )
+
+        let semantics = DSSemanticTokens(
+            spacing: semanticSpacing,
+            text: base.semantics.text,
+            surfaces: semanticSurfaces,
+            actions: semanticActions,
+            borders: semanticBorders
+        )
+
+        return Self(
+            primitives: base.primitives,
+            semantics: semantics,
+            components: DSComponentTokens.make(from: semantics)
+        )
+    }
+}
+
+private struct DSTokenBundleEnvironmentKey: EnvironmentKey {
+    static let defaultValue: DSTokenBundle = .make(for: .ocean)
+}
+
+extension EnvironmentValues {
+    // Canonical token bundle entry for themed subtrees.
+    var dsTokenBundle: DSTokenBundle {
+        get { self[DSTokenBundleEnvironmentKey.self] }
+        set { self[DSTokenBundleEnvironmentKey.self] = newValue }
+    }
+
+    // Backward-compatible alias used by existing stage specimens.
+    var dsTokens: DSTokenBundle {
+        get { dsTokenBundle }
+        set { dsTokenBundle = newValue }
+    }
+}
+
+struct DSThemeProvider<Content: View>: View {
+    let brandDecision: DSBrandDecision
+    @ViewBuilder var content: Content
+
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var tokenBundle: DSTokenBundle {
+        .make(
+            for: DSThemeInput(
+                brandDecision: brandDecision,
+                colorScheme: colorScheme,
+                colorSchemeContrast: colorSchemeContrast,
+                dynamicTypeSize: dynamicTypeSize
+            )
+        )
+    }
+
+    var body: some View {
+        content
+            .environment(\.dsTokenBundle, tokenBundle)
+    }
+}
+
+extension View {
+    /// Wrap a screen/subtree and resolve a token bundle from runtime environment.
+    func dsTheme(_ brandDecision: DSBrandDecision) -> some View {
+        DSThemeProvider(brandDecision: brandDecision) {
+            self
+        }
     }
 }
 

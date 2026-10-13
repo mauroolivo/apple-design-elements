@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
-Last updated: 2026-10-12
-Stage: 8
+Last updated: 2026-10-13
+Stage: 9
 Status: Draft v0
 
 ## Purpose
@@ -71,6 +71,11 @@ Not implemented as public API yet, but the lab is converging on these naming tar
 A reusable component should prefer semantic/component tokens over direct raw values. Raw values remain acceptable only when the scope is local, explicit, and intentionally non-shared.
 
 ## Next-stage considerations
-- Stage 9: appearance variants and environment propagation
 - Stage 10: Figma-to-token mapping contract
 - Stage 12+: turn stable tokenized specimens into reusable component APIs
+
+## Stage 9 - Theme resolution and propagation
+- Add `DSThemeInput` as a runtime boundary (`brandDecision`, `colorScheme`, `colorSchemeContrast`, `dynamicTypeSize`).
+- Resolve one `DSTokenBundle` from that boundary and inject it via `EnvironmentValues.dsTokens`.
+- Consume tokens in leaf components with `@Environment(\.dsTokens)` to reduce API coupling and manual threading.
+- Keep anti-pattern reference: manually passing `tokenBundle` through non-owning layers (prop drilling).
