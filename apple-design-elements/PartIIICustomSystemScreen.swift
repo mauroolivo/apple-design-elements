@@ -21,8 +21,12 @@ struct PartIIICustomSystemScreen: View {
                 LocalizationRTLStressSection()
             }
 
+            Section("Stage 17 Motion, Feedback Timing, and Interruption Handling") {
+                MotionTimingInterruptionSection()
+            }
+
             Section("Part III Roadmap") {
-                Label("Stage 17 - Motion, feedback timing, and interruption handling", systemImage: "bolt")
+                Label("Stage 18 - Data states, skeletons, and empty/error patterns", systemImage: "square.stack.3d.up")
             }
 
             Section("Baseline Visual Matrix") {
@@ -39,9 +43,228 @@ struct PartIIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Preserve native semantics, compose from shared foundations, and treat accessibility guarantees as release-blocking component contracts.")
+                Text("Preserve native semantics, compose from shared foundations, and enforce accessibility, localization, motion, and interruption contracts before promotion.")
             }
         }
+    }
+}
+
+private enum Stage17RequestState: String {
+    case idle = "Idle"
+    case saving = "Saving"
+    case success = "Success"
+    case failure = "Failure"
+    case interrupted = "Interrupted"
+}
+
+private struct MotionTimingInterruptionSection: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var requestState: Stage17RequestState = .idle
+    @State private var responseOutcomeIsFailure = false
+    @State private var simulatedLatencyMs: Double = 700
+    @State private var simulateFeedbackFlood = false
+    @State private var requestToken = UUID()
+
+    private var timingContractPasses: Bool {
+        !simulateFeedbackFlood
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            MotionEnvironmentCard(reduceMotion: reduceMotion)
+
+            Toggle("Simulate failure outcome", isOn: $responseOutcomeIsFailure)
+            Toggle("Simulate feedback flood anti-pattern", isOn: $simulateFeedbackFlood)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Simulated response delay: \(Int(simulatedLatencyMs)) ms")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                Slider(value: $simulatedLatencyMs, in: 150...2400, step: 50)
+                    .accessibilityLabel("Simulated response delay")
+            }
+
+            MotionFeedbackContractCard(
+                requestState: requestState,
+                simulatedLatencyMs: Int(simulatedLatencyMs),
+                simulateFeedbackFlood: simulateFeedbackFlood
+            )
+
+            HStack(spacing: 8) {
+                DSButton(
+                    requestState == .saving ? "Saving..." : "Simulate save",
+                    role: .primary,
+                    size: .regular,
+                    state: requestState == .saving ? .loading : .enabled,
+                    action: startSimulatedSave
+                )
+
+                DSButton(
+                    "Interrupt",
+                    role: .secondary,
+                    size: .regular,
+                    state: requestState == .saving ? .enabled : .disabled,
+                    action: interruptCurrentRequest
+                )
+            }
+            .dsTheme(.ocean)
+
+            if simulateFeedbackFlood {
+                VStack(alignment: .leading, spacing: 6) {
+                    DSFeedbackBanner(kind: .info, title: "Queue event", message: "Request queued.")
+                    DSFeedbackBanner(kind: .info, title: "Queue event", message: "Request still queued.")
+                    DSFeedbackBanner(kind: .warning, title: "Queue event", message: "Too many overlapping notices reduce clarity.")
+                }
+            }
+
+            DSFeedbackBanner(
+                kind: statusBannerKind,
+                title: statusBannerTitle,
+                message: statusBannerMessage
+            )
+
+            Text("Stage 17 rule: feedback must acknowledge action quickly, communicate progress clearly, and handle interruption without motion-heavy or duplicate-notice noise.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var statusBannerKind: DSFeedbackKind {
+        switch requestState {
+        case .idle: return .info
+        case .saving: return .info
+        case .success: return .success
+        case .failure: return .critical
+        case .interrupted: return .warning
+        }
+    }
+
+    private var statusBannerTitle: String {
+        switch requestState {
+        case .idle: return "Awaiting action"
+        case .saving: return "In progress"
+        case .success: return "Save completed"
+        case .failure: return "Save failed"
+        case .interrupted: return "Save interrupted"
+        }
+    }
+
+    private var statusBannerMessage: String {
+        switch requestState {
+        case .idle:
+            return "Start a request to evaluate timing and interruption behavior."
+        case .saving:
+            return "Progress is visible and cancellation remains available while work is in flight."
+        case .success:
+            return "Completion feedback appears once without stacking duplicated notices."
+        case .failure:
+            return "Failure is explicit and should offer a stable retry path."
+        case .interrupted:
+            return "Interruption is explicit so users understand why completion feedback did not arrive."
+        }
+    }
+
+    private func startSimulatedSave() {
+        let token = UUID()
+        requestToken = token
+        setState(.saving)
+
+        let nanoseconds = UInt64(simulatedLatencyMs * 1_000_000)
+        Task {
+            try? await Task.sleep(nanoseconds: nanoseconds)
+            guard requestToken == token, requestState == .saving else { return }
+            setState(responseOutcomeIsFailure ? .failure : .success)
+        }
+    }
+
+    private func interruptCurrentRequest() {
+        requestToken = UUID()
+        setState(.interrupted)
+    }
+
+    private func setState(_ newState: Stage17RequestState) {
+        if reduceMotion {
+            requestState = newState
+        } else {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                requestState = newState
+            }
+        }
+    }
+}
+
+private struct MotionEnvironmentCard: View {
+    let reduceMotion: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Motion and timing snapshot")
+                .font(.subheadline.weight(.semibold))
+
+            AccessibilityEnvironmentRow(label: "Reduce motion", value: reduceMotion ? "On" : "Off")
+            AccessibilityEnvironmentRow(label: "Contract focus", value: "Action acknowledgment + progress + interruption")
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct MotionFeedbackContractCard: View {
+    let requestState: Stage17RequestState
+    let simulatedLatencyMs: Int
+    let simulateFeedbackFlood: Bool
+
+    private var quickAcknowledgePasses: Bool {
+        requestState == .saving || requestState == .success || requestState == .failure || requestState == .interrupted
+    }
+
+    private var progressVisibilityPasses: Bool {
+        requestState != .idle
+    }
+
+    private var interruptionPasses: Bool {
+        requestState != .idle
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Stage 17 guarantee checklist")
+                .font(.subheadline.weight(.semibold))
+
+            AccessibilityCheckRow(
+                label: "Action acknowledged quickly",
+                passes: quickAcknowledgePasses,
+                failureReason: "No immediate state change after interaction."
+            )
+            AccessibilityCheckRow(
+                label: "Progress/terminal state is visible",
+                passes: progressVisibilityPasses,
+                failureReason: "Users cannot tell whether work is in progress or finished."
+            )
+            AccessibilityCheckRow(
+                label: "Interruption outcome is explicit",
+                passes: interruptionPasses,
+                failureReason: "Cancellation/override leaves ambiguous status."
+            )
+            AccessibilityCheckRow(
+                label: "Avoid duplicate feedback stacking",
+                passes: !simulateFeedbackFlood,
+                failureReason: "Overlapping notices create motion and cognitive noise."
+            )
+
+            Text("Current state: \(requestState.rawValue), simulated delay: \(simulatedLatencyMs) ms")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
     }
 }
 

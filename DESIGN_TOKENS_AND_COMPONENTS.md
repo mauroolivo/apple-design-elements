@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 16
+Stage: 17
 Status: Draft v0
 
 ## Purpose
@@ -119,4 +119,10 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Prefer semantic directional symbols and adaptive text containers over fixed-direction visual assumptions.
 - Validate long translated strings and pseudo-localized copies against component layout contracts before promotion.
 - Treat truncation-related meaning loss as a design-system bug, not a copywriting issue.
+
+## Stage 17 - Motion and feedback-state ownership
+- Add interaction-state timing rules to component contracts (acknowledge, in-progress, success/failure, interrupted).
+- Respect reduced-motion preferences when transitioning between feedback states.
+- Prevent duplicate or stacked banners/spinners that increase cognitive load and blur state transitions.
+- Treat interruption handling as a first-class reusable behavior contract, not screen-specific glue logic.
 

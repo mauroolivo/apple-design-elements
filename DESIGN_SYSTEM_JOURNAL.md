@@ -979,3 +979,58 @@ Verification:
 ### Stop and wait for `next`
 Stage 16 is complete. Continue only after receiving `next`.
 
+---
+
+## Stage 17 - Motion, feedback timing, and interruption handling
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Model feedback timing and interruption as reusable component contracts so users receive immediate acknowledgment, clear progress, and explicit terminal/interrupted outcomes.
+
+### Apple baseline / reference behavior
+- Source used: Apple HIG motion guidance for transition clarity and restraint.
+- Source used: SwiftUI reduced-motion environment signal and animation APIs.
+- Source used: Stage 15 accessibility contract framing and Stage 16 stress-discipline approach.
+
+### Design question and prediction
+- Question: Can we encode timing/interruption expectations in reusable contracts instead of treating feedback behavior as per-screen custom logic?
+- Prediction: Yes. If request state transitions are explicit and environment-aware, timing and interruption behavior remain consistent across flows.
+
+### Minimal hands-on implementation
+- Extended `apple-design-elements/PartIIICustomSystemScreen.swift` with Stage 17:
+  - `Stage17RequestState`
+  - `MotionTimingInterruptionSection`
+  - `MotionEnvironmentCard`
+  - `MotionFeedbackContractCard`
+- Added a deterministic simulated request flow with explicit states (`idle`, `saving`, `success`, `failure`, `interrupted`).
+- Added controls for failure outcome, simulated delay, interruption, and feedback-flood anti-pattern.
+- Applied reduced-motion-aware state transitions and advanced roadmap to Stage 18.
+
+### Figma/reference comparison or visual inspection
+- Stage 17 is behavior-contract focused and does not claim new Figma-derived geometry values.
+- Visual checks focus on state clarity and avoiding noisy stacked feedback under stress toggles.
+
+### Accessibility and adaptation checks
+- Reduced-motion preference is honored by avoiding forced animation when motion reduction is active.
+- Terminal and interruption outcomes are explicit so users are not left in ambiguous in-flight states.
+- Feedback flood simulation demonstrates why duplicate notices are a contract failure.
+
+### Trade-offs and design-system rule
+- Trade-off: explicit state machinery adds implementation overhead but prevents inconsistent request behavior drift.
+- Rule: feedback timing and interruption semantics are part of component contracts, not optional polish.
+
+### Journal entry
+Stage 17 decisions:
+1. Encode request lifecycle states as reusable contract vocabulary.
+2. Add interruption control and deterministic delay simulation in Part III.
+3. Respect reduced-motion settings during state transitions.
+4. Treat banner/spinner flooding as an anti-pattern and contract regression.
+
+Verification:
+- Stage 17 implementation compiles in the app target after integration.
+- Additional simulator spot-checks should include Reduce Motion on/off with interruption mid-flight.
+
+### Stop and wait for `next`
+Stage 17 is complete. Continue only after receiving `next`.
+
