@@ -750,3 +750,60 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 12 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 13 - Forms and interactive controls
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Model text input and selection as native control contracts wrapped in branded, grouped form composition so editing, focus, and validation behavior remain platform-correct.
+
+### Apple baseline / reference behavior
+- Source used: SwiftUI `TextField`, `SecureField`, `Picker`, `Toggle`, and `FocusState` semantics.
+- Source used: Stage 5 control-contract notes about preserving native behavior.
+- Source used: Stage 12 component API conventions for explicit role/state modeling.
+
+### Design question and prediction
+- Question: Can a branded field component preserve native editing/focus while adding validation and helper/error messaging?
+- Prediction: Yes. Keep the input controls native, then layer validation and grouping around them.
+
+### Minimal hands-on implementation
+- Added `apple-design-elements/DSFieldFamily.swift` with:
+  - `DSFieldState` (`normal`, `focused`, `disabled`, `error`)
+  - `DSField` wrapper around native `TextField`/`SecureField`
+  - helper/error text, focus binding, keyboard/text-content configuration
+- Extended `apple-design-elements/PartIICustomSystemScreen.swift` with Stage 13 section:
+  - `FormsAndInteractiveControlsSection`
+  - grouped account card with `DSField`, `Toggle`, `Picker`, and `DSButton`
+  - `FormControlsAntiPatternCard`
+- Updated roadmap to Stage 14 and revised current-rule text for form grouping and native editing preservation.
+
+### Figma/reference comparison or visual inspection
+- Stage 13 remains contract-focused; it reuses prior fidelity guidance and does not claim new Figma numeric values.
+- The form card is course-authored composition built on documented Apple control semantics.
+
+### Accessibility and adaptation checks
+- `DSField` keeps text editing native, supports secure entry, and surfaces validation state without replacing the keyboard/focus model.
+- Helper/error messaging is explicit and state-driven so VoiceOver and visual affordances stay aligned.
+- Grouping related controls in one card improves scanability and reduces state fragmentation.
+
+### Trade-offs and design-system rule
+- Trade-off: wrapping native fields adds a little structure, but keeps behavior and accessibility stable.
+- Rule: preserve native editing/focus/selection; layer styling and validation around controls instead of rebuilding them.
+
+### Journal entry
+Stage 13 decisions:
+1. Implement `DSField` as a native text-input wrapper with state-driven styling and messages.
+2. Group related inputs, selection, and action controls into a single form card.
+3. Model field states explicitly to support deterministic validation and disabled/focused behavior.
+4. Keep focus and keyboard behavior in platform control APIs, not custom gestures.
+
+Verification:
+- Local build after Stage 13 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Stage 13 specimen now includes editable fields, secure field, picker, toggles, and grouped action validation.
+
+### Stop and wait for `next`
+Stage 13 is complete. Continue only after receiving `next`.

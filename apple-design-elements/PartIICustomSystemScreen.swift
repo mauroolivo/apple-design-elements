@@ -29,8 +29,12 @@ struct PartIICustomSystemScreen: View {
                 ComponentAnatomySection()
             }
 
+            Section("Stage 13 Forms & Interactive Controls") {
+                FormsAndInteractiveControlsSection()
+            }
+
             Section("Part II Roadmap") {
-                Label("Stage 13 - Forms and interactive controls", systemImage: "character.cursor.ibeam")
+                Label("Stage 14 - Composed components and consistency", systemImage: "rectangle.stack")
             }
 
             Section("Baseline Visual Matrix") {
@@ -47,9 +51,156 @@ struct PartIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Expose component APIs as semantic role/size/state contracts, avoid boolean-style explosion, and preserve native control semantics under tokenized styling.")
+                Text("Expose component APIs as semantic role/size/state contracts, group related inputs coherently, and preserve native editing/selection behavior under tokenized styling.")
             }
         }
+    }
+}
+
+private enum DSAccountTier: String, CaseIterable, Identifiable {
+    case basic = "Basic"
+    case plus = "Plus"
+    case pro = "Pro"
+
+    var id: String { rawValue }
+}
+
+private struct FormsAndInteractiveControlsSection: View {
+    @State private var email = ""
+    @State private var password = ""
+    @State private var referral = ""
+    @State private var marketingOptIn = true
+    @State private var disableForm = false
+    @State private var showValidation = true
+    @State private var selectedTier: DSAccountTier = .plus
+
+    private var emailState: DSFieldState {
+        disableForm ? .disabled : .normal
+    }
+
+    private var passwordState: DSFieldState {
+        if disableForm { return .disabled }
+        return showValidation && password.count < 8 ? .error : .normal
+    }
+
+    private var referralState: DSFieldState {
+        disableForm ? .disabled : .normal
+    }
+
+    private var canContinue: Bool {
+        !disableForm && !email.isEmpty && password.count >= 8
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Toggle("Disable form", isOn: $disableForm)
+            Toggle("Show validation", isOn: $showValidation)
+
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Account details")
+                    .font(.headline)
+
+                DSField(
+                    title: "Email",
+                    placeholder: "name@domain.com",
+                    text: $email,
+                    state: emailState,
+                    helperText: "Used for sign-in and product updates.",
+                    keyboardType: .emailAddress,
+                    textContentType: .emailAddress,
+                    submitLabel: .next
+                )
+
+                DSField(
+                    title: "Password",
+                    placeholder: "Enter a password",
+                    text: $password,
+                    state: passwordState,
+                    helperText: showValidation ? nil : "Validation hidden for this scenario.",
+                    errorText: "Password must contain at least 8 characters.",
+                    isSecure: true,
+                    keyboardType: .default,
+                    textContentType: .newPassword,
+                    submitLabel: .done
+                )
+
+                DSField(
+                    title: "Referral code",
+                    placeholder: "Optional",
+                    text: $referral,
+                    state: referralState,
+                    helperText: "Optional promotion code or invite.",
+                    keyboardType: .asciiCapable,
+                    submitLabel: .go
+                )
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Account tier")
+                        .font(.footnote.weight(.semibold))
+                    Picker("Account tier", selection: $selectedTier) {
+                        ForEach(DSAccountTier.allCases) { tier in
+                            Text(tier.rawValue).tag(tier)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Toggle("Marketing emails", isOn: $marketingOptIn)
+
+                Text("Grouping note: this card keeps related inputs, selection controls, and the primary action together for easier scanning and validation.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                DSButton(
+                    canContinue ? "Continue" : "Fix form to continue",
+                    role: .primary,
+                    size: .regular,
+                    state: canContinue ? .enabled : .disabled,
+                    action: {}
+                )
+                .dsTheme(.ocean)
+
+                Text(formSummary)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+            FormControlsAntiPatternCard()
+
+            Text("Stage 13 rule: preserve native editing, selection, and focus behavior; use DSField for validation and form grouping rather than rebuilding text input mechanics.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var formSummary: String {
+        let emailSummary = email.isEmpty ? "empty" : "filled"
+        let optInSummary = marketingOptIn ? "on" : "off"
+        return [
+            "State: tier=\(selectedTier.rawValue)",
+            "email=\(emailSummary)",
+            "passwordLength=\(password.count)",
+            "optIn=\(optInSummary)"
+        ]
+        .joined(separator: ", ")
+    }
+}
+
+private struct FormControlsAntiPatternCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Anti-pattern: fragments spread across unrelated screens")
+                .font(.subheadline.weight(.semibold))
+
+            Text("When labels, fields, selection controls, and actions are separated, validation and focus cues are harder to understand and preserve.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

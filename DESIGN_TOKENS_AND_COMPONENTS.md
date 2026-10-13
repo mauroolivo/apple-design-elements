@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 12
+Stage: 13
 Status: Draft v0
 
 ## Purpose
@@ -95,3 +95,9 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Keep visual resolution in one style layer so pressed/disabled/loading behavior remains consistent.
 - Consume token bundle via environment at component level and keep theming at subtree boundary.
 - Treat loading/disabled as explicit state, not incidental modifiers spread across screens.
+
+## Stage 13 - Forms and interactive controls
+- Add `DSField` as a reusable form control that keeps editing semantics native while styling via tokenized surfaces and borders.
+- Model validation states explicitly (`normal`, `focused`, `disabled`, `error`) so helper/error rendering remains deterministic.
+- Preserve focus and keyboard behavior via SwiftUI focus APIs rather than custom gesture plumbing.
+- Group controls and action affordances into a card-level form pattern to clarify ownership and hierarchy.
