@@ -11,6 +11,7 @@ struct LabEnvironmentAssumption: Identifiable {
 private enum LabCoursePart: String, CaseIterable, Identifiable {
     case partI = "Part I"
     case partII = "Part II"
+    case partIII = "Part III"
 
     var id: String { rawValue }
 }
@@ -42,8 +43,10 @@ struct ContentView: View {
 
                 if selectedPart == .partI {
                     PartIFoundationsScreen(assumptions: assumptions)
-                } else {
+                } else if selectedPart == .partII {
                     PartIICustomSystemScreen(assumptions: assumptions)
+                } else {
+                    PartIIICustomSystemScreen(assumptions: assumptions)
                 }
             }
             .navigationTitle("DesignSystemLab")
