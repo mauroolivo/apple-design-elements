@@ -442,3 +442,64 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 7 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 8 - Token modeling: primitive -> semantic -> component
+
+Date: 2026-10-12
+
+### Goal and design-system mental model
+Model raw values, semantic intent, and component-local decisions as separate layers so brand changes can propagate predictably without rewriting reusable UI internals.
+
+### Apple baseline / reference behavior
+- Source used: prior HIG semantics for typography, color, materials, and controls remain the baseline ownership model.
+- Source used: SwiftUI `EnvironmentValues` and `@Environment` docs to justify environment-derived inputs where appropriate.
+- Source used: SwiftUI `Color.init(uiColor:)` bridge to keep UIKit semantic colors available inside SwiftUI token modeling.
+
+### Design question and prediction
+- Question: Can we change a brand decision in one place and have multiple components update without rewriting component internals?
+- Prediction: Yes, if brand values are modeled as primitives that feed semantic and component tokens. No, if reusable components own raw values directly.
+
+### Minimal hands-on implementation
+- Added `apple-design-elements/DSTokens.swift` with typed token layers:
+  - `DSPrimitiveTokens`
+  - `DSSemanticTokens`
+  - `DSComponentTokens`
+  - `DSTokenBundle`
+  - `DSBrandDecision` as the single experiment input
+- Extended `apple-design-elements/PartIICustomSystemScreen.swift` with Stage 8 UI:
+  - `TokenModelingSection`
+  - `TokenPipelineCard`
+  - `TokenizedComponentShowcase`
+  - tokenized sample components (`DSTokenCard`, `DSTokenButton`, `DSTokenBadge`)
+  - `MagicNumberAntiPatternCard`
+- Created `DESIGN_TOKENS_AND_COMPONENTS.md` as the first dedicated token taxonomy artifact.
+
+### Figma/reference comparison or visual inspection
+- No inspectable official Apple Figma file is available in this workspace.
+- Stage 8 is grounded in Apple APIs and course-authored token experiments, not Apple kit measurements.
+
+### Accessibility and adaptation checks
+- Semantic tokens continue to derive from system-owned roles where appropriate (`Color.primary`, `separator`, `secondarySystemBackground`).
+- Tokenized components update via one brand-decision source while preserving those platform-derived semantics.
+- Anti-pattern card demonstrates that raw values bypass shared adaptation logic and resist coordinated updates.
+
+### Trade-offs and design-system rule
+- Trade-off: typed token layers add indirection, but they reduce scattered brand decisions and make reuse safer.
+- Rule: raw values are acceptable locally; shared UI must prefer semantic/component tokens when the same design intent appears in more than one component.
+
+### Journal entry
+Stage 8 decisions:
+1. Introduce typed structs for primitive, semantic, and component token layers instead of a giant global theme object.
+2. Allow semantic tokens to mix brand primitives with Apple-owned semantic roles when that preserves platform behavior.
+3. Use a single brand-decision entry point (`DSBrandDecision`) to prove propagation through the token graph.
+4. Treat direct raw values in reusable components as an anti-pattern unless deliberately scoped and documented.
+
+Verification:
+- Local build after Stage 8 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- The Stage 8 brand picker proves tokenized components update from one source while the magic-number anti-pattern remains fixed.
+
+### Stop and wait for `next`
+Stage 8 is complete. Continue only after receiving `next`.
