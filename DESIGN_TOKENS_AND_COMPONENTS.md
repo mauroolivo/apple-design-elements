@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 14
+Stage: 15
 Status: Draft v0
 
 ## Purpose
@@ -107,3 +107,9 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Keep layout choices close to the consumer screen while reusable parts own their local token mapping.
 - Use a shared surface/spacing system so composed components stay visually consistent across contexts.
 - Compare a semantic-token composition against a duplicated-number composition to reveal maintenance drift.
+
+## Stage 15 - Accessibility contract ownership
+- Add an accessibility guarantee matrix to component evaluation (VoiceOver semantics, non-color meaning, touch-target comfort).
+- Treat accessibility-related component state as contract data, not ad-hoc view-level overrides.
+- Validate accessibility assumptions against active environment signals (Dynamic Type, contrast, layout direction, reduce-motion/transparency, differentiate-without-color).
+- Block promotion of reusable variants when any accessibility guarantee fails, even if visuals appear acceptable.

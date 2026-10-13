@@ -865,3 +865,61 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 14 is complete. Continue only after receiving `next`.
+
+---
+
+## Stage 15 - Accessibility as a design-system guarantee
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Define accessibility as a hard component contract so semantics, non-color cues, touch-target comfort, and adaptation behavior are validated before a variant is promoted.
+
+### Apple baseline / reference behavior
+- Source used: Apple HIG accessibility guidance and semantic communication principles.
+- Source used: SwiftUI accessibility environment values (`accessibilityDifferentiateWithoutColor`, `accessibilityReduceMotion`, `accessibilityReduceTransparency`).
+- Source used: SwiftUI semantic labeling APIs (`accessibilityLabel`, `accessibilityHint`) and existing Dynamic Type/contrast/layout-direction signals.
+
+### Design question and prediction
+- Question: Can Stage 13/14 components be evaluated by a repeatable accessibility contract in the same way we evaluate visual and token consistency?
+- Prediction: Yes. If accessibility guarantees are explicit checklist items tied to component behavior, regressions become easier to detect and block.
+
+### Minimal hands-on implementation
+- Extended `apple-design-elements/PartIIICustomSystemScreen.swift` with Stage 15:
+  - `AccessibilityGuaranteeSection`
+  - `AccessibilityEnvironmentMatrixCard`
+  - `AccessibilityContractCard`
+  - `AccessibilityRegressionComparisonCard`
+- Added environment snapshot checks for Dynamic Type, contrast, layout direction, reduce motion/transparency, and differentiate-without-color.
+- Added toggle-driven regression simulation for:
+  - missing semantic labels
+  - color-only status communication
+  - compact tap targets
+- Advanced Part III roadmap to Stage 16.
+
+### Figma/reference comparison or visual inspection
+- Stage 15 is behavior and contract focused; it does not introduce new Figma-derived numeric values.
+- The specimen classifies accessibility failures as contract regressions independent of visual styling quality.
+
+### Accessibility and adaptation checks
+- Semantic cues are evaluated alongside visual cues so meaning does not depend on color alone.
+- Environmental adaptation signals are surfaced in the specimen to keep checks reproducible.
+- Contract pass/fail state is explicit and user-visible in the stage output.
+
+### Trade-offs and design-system rule
+- Trade-off: additional checklist structure increases stage complexity, but it prevents late accessibility regressions.
+- Rule: accessibility guarantees are release-blocking component contracts, not optional QA polish.
+
+### Journal entry
+Stage 15 decisions:
+1. Add an explicit accessibility guarantee matrix to Part III.
+2. Simulate contract regressions directly in-stage to teach detection discipline.
+3. Tie pass/fail to semantic labeling, non-color meaning, and target comfort requirements.
+4. Advance roadmap to localization/RTL/content-stress validation after accessibility contract stabilization.
+
+Verification:
+- Stage 15 implementation compiles in local file-level checks.
+- Full project build verification is required after all stage edits are complete.
+
+### Stop and wait for `next`
+Stage 15 is complete. Continue only after receiving `next`.

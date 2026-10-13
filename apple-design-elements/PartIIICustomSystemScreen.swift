@@ -13,8 +13,12 @@ struct PartIIICustomSystemScreen: View {
                 ComposedComponentsConsistencySection()
             }
 
+            Section("Stage 15 Accessibility as a Design-System Guarantee") {
+                AccessibilityGuaranteeSection()
+            }
+
             Section("Part III Roadmap") {
-                Label("Stage 15 - Accessibility as a design-system guarantee", systemImage: "accessibility")
+                Label("Stage 16 - Localization, RTL, and content stress scenarios", systemImage: "globe")
             }
 
             Section("Baseline Visual Matrix") {
@@ -31,9 +35,232 @@ struct PartIIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Preserve native editing semantics, then compose cards, rows, headers, badges, and feedback from shared foundations.")
+                Text("Preserve native semantics, compose from shared foundations, and treat accessibility guarantees as release-blocking component contracts.")
             }
         }
+    }
+}
+
+private struct AccessibilityGuaranteeSection: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @Environment(\.layoutDirection) private var layoutDirection
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+
+    @State private var missingSemanticLabel = false
+    @State private var colorOnlyStatus = false
+    @State private var compactTouchTarget = false
+
+    private var passesContract: Bool {
+        !missingSemanticLabel && !colorOnlyStatus && !compactTouchTarget
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            AccessibilityEnvironmentMatrixCard(
+                dynamicTypeSize: dynamicTypeSize,
+                colorSchemeContrast: colorSchemeContrast,
+                layoutDirection: layoutDirection,
+                reduceMotion: reduceMotion,
+                reduceTransparency: reduceTransparency,
+                differentiateWithoutColor: differentiateWithoutColor
+            )
+
+            Toggle("Simulate missing semantic labels", isOn: $missingSemanticLabel)
+            Toggle("Simulate color-only status communication", isOn: $colorOnlyStatus)
+            Toggle("Simulate compact tap target", isOn: $compactTouchTarget)
+
+            AccessibilityContractCard(
+                missingSemanticLabel: missingSemanticLabel,
+                colorOnlyStatus: colorOnlyStatus,
+                compactTouchTarget: compactTouchTarget
+            )
+
+            if passesContract {
+                DSFeedbackBanner(
+                    kind: .success,
+                    title: "Accessibility contract passes",
+                    message: "Semantics, non-color cues, and interaction size remain explicit under current environment settings."
+                )
+            } else {
+                DSFeedbackBanner(
+                    kind: .warning,
+                    title: "Accessibility contract regression",
+                    message: "One or more guarantees are broken. Fix component semantics or token constraints before promoting this variant."
+                )
+            }
+
+            AccessibilityRegressionComparisonCard(
+                missingSemanticLabel: missingSemanticLabel,
+                colorOnlyStatus: colorOnlyStatus,
+                compactTouchTarget: compactTouchTarget
+            )
+
+            Text("Stage 15 rule: treat accessibility as a release-blocking design-system contract, not a post-hoc visual QA checklist.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct AccessibilityEnvironmentMatrixCard: View {
+    let dynamicTypeSize: DynamicTypeSize
+    let colorSchemeContrast: ColorSchemeContrast
+    let layoutDirection: LayoutDirection
+    let reduceMotion: Bool
+    let reduceTransparency: Bool
+    let differentiateWithoutColor: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Accessibility environment snapshot")
+                .font(.subheadline.weight(.semibold))
+
+            AccessibilityEnvironmentRow(label: "Dynamic Type", value: dynamicTypeDescription)
+            AccessibilityEnvironmentRow(label: "Contrast", value: colorSchemeContrast == .increased ? "Increased" : "Standard")
+            AccessibilityEnvironmentRow(label: "Layout direction", value: layoutDirection == .rightToLeft ? "RTL" : "LTR")
+            AccessibilityEnvironmentRow(label: "Reduce motion", value: reduceMotion ? "On" : "Off")
+            AccessibilityEnvironmentRow(label: "Reduce transparency", value: reduceTransparency ? "On" : "Off")
+            AccessibilityEnvironmentRow(label: "Differentiate without color", value: differentiateWithoutColor ? "On" : "Off")
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var dynamicTypeDescription: String {
+        switch dynamicTypeSize {
+        case .xSmall: return "xSmall"
+        case .small: return "small"
+        case .medium: return "medium"
+        case .large: return "large"
+        case .xLarge: return "xLarge"
+        case .xxLarge: return "xxLarge"
+        case .xxxLarge: return "xxxLarge"
+        case .accessibility1: return "accessibility1"
+        case .accessibility2: return "accessibility2"
+        case .accessibility3: return "accessibility3"
+        case .accessibility4: return "accessibility4"
+        case .accessibility5: return "accessibility5"
+        @unknown default: return "unknown"
+        }
+    }
+}
+
+private struct AccessibilityEnvironmentRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 12)
+            Text(value)
+                .fontWeight(.medium)
+        }
+        .font(.footnote)
+    }
+}
+
+private struct AccessibilityContractCard: View {
+    let missingSemanticLabel: Bool
+    let colorOnlyStatus: Bool
+    let compactTouchTarget: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Guarantee checklist")
+                .font(.subheadline.weight(.semibold))
+
+            AccessibilityCheckRow(
+                label: "VoiceOver-readable labels and hints",
+                passes: !missingSemanticLabel,
+                failureReason: "A key interactive element lost semantic text."
+            )
+            AccessibilityCheckRow(
+                label: "Status communication beyond color",
+                passes: !colorOnlyStatus,
+                failureReason: "Meaning depends on color without icon/text redundancy."
+            )
+            AccessibilityCheckRow(
+                label: "Minimum touch target and control comfort",
+                passes: !compactTouchTarget,
+                failureReason: "Interactive target is too small for reliable input."
+            )
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private struct AccessibilityCheckRow: View {
+    let label: String
+    let passes: Bool
+    let failureReason: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 8) {
+                Image(systemName: passes ? "checkmark.circle.fill" : "xmark.circle.fill")
+                    .foregroundStyle(passes ? .green : .orange)
+                Text(label)
+                    .font(.footnote)
+            }
+            if !passes {
+                Text(failureReason)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 24)
+            }
+        }
+    }
+}
+
+private struct AccessibilityRegressionComparisonCard: View {
+    let missingSemanticLabel: Bool
+    let colorOnlyStatus: Bool
+    let compactTouchTarget: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Comparison: guaranteed contract vs regression")
+                .font(.subheadline.weight(.semibold))
+
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Guaranteed: DSFeedbackBanner + DSStatusBadge + explicit text", systemImage: "checkmark.circle")
+                    .font(.footnote)
+
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(colorOnlyStatus ? .orange : .green)
+                        .frame(width: 10, height: 10)
+                        .accessibilityHidden(true)
+
+                    Text(missingSemanticLabel ? "" : "Regressed sample")
+                        .font(.caption)
+                        .lineLimit(1)
+
+                    Text("Tap")
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, compactTouchTarget ? 4 : 10)
+                        .padding(.vertical, compactTouchTarget ? 3 : 8)
+                        .background(Color(uiColor: .tertiarySystemBackground), in: Capsule())
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(missingSemanticLabel ? "" : "Regressed sample")
+                .accessibilityHint("Illustrates how missing semantics, color-only cues, or small targets create accessibility risk.")
+            }
+            .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
