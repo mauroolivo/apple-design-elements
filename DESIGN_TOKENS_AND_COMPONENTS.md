@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 15
+Stage: 16
 Status: Draft v0
 
 ## Purpose
@@ -113,3 +113,10 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Treat accessibility-related component state as contract data, not ad-hoc view-level overrides.
 - Validate accessibility assumptions against active environment signals (Dynamic Type, contrast, layout direction, reduce-motion/transparency, differentiate-without-color).
 - Block promotion of reusable variants when any accessibility guarantee fails, even if visuals appear acceptable.
+
+## Stage 16 - Localization and directionality ownership
+- Add locale and directionality stress checks to reusable component acceptance criteria.
+- Prefer semantic directional symbols and adaptive text containers over fixed-direction visual assumptions.
+- Validate long translated strings and pseudo-localized copies against component layout contracts before promotion.
+- Treat truncation-related meaning loss as a design-system bug, not a copywriting issue.
+

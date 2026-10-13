@@ -17,8 +17,12 @@ struct PartIIICustomSystemScreen: View {
                 AccessibilityGuaranteeSection()
             }
 
+            Section("Stage 16 Localization, RTL, and Content Stress") {
+                LocalizationRTLStressSection()
+            }
+
             Section("Part III Roadmap") {
-                Label("Stage 16 - Localization, RTL, and content stress scenarios", systemImage: "globe")
+                Label("Stage 17 - Motion, feedback timing, and interruption handling", systemImage: "bolt")
             }
 
             Section("Baseline Visual Matrix") {
@@ -38,6 +42,217 @@ struct PartIIICustomSystemScreen: View {
                 Text("Preserve native semantics, compose from shared foundations, and treat accessibility guarantees as release-blocking component contracts.")
             }
         }
+    }
+}
+
+private enum Stage16LocalePreset: String, CaseIterable, Identifiable {
+    case english = "English"
+    case german = "German"
+    case arabic = "Arabic"
+    case pseudo = "Pseudo"
+
+    var id: String { rawValue }
+
+    var sampleTitle: String {
+        switch self {
+        case .english: return "Account security settings"
+        case .german: return "Kontosicherheitseinstellungen"
+        case .arabic: return "I3dadat amn alhisab"
+        case .pseudo: return "[!! Accoouuntt Seccuurriittyy Settiinnggs !!]"
+        }
+    }
+
+    var sampleDescription: String {
+        switch self {
+        case .english: return "Review sign-in methods, active sessions, and recovery options."
+        case .german: return "Prufen Sie Anmeldemethoden, aktive Sitzungen und Wiederherstellungsoptionen."
+        case .arabic: return "Murajaat turuq tasjil aldukhul waljalsat alnaashita wakhiyaarat alistirjae."
+        case .pseudo: return "[!! Reevieew siggn-inn methhoods, actiive sessiions, and recooveery optiions. !!]"
+        }
+    }
+
+    var actionTitle: String {
+        switch self {
+        case .english: return "Review"
+        case .german: return "Uberprufen"
+        case .arabic: return "Murajaa"
+        case .pseudo: return "[!! Reevieew Noow !!]"
+        }
+    }
+}
+
+private struct LocalizationRTLStressSection: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.layoutDirection) private var layoutDirection
+
+    @State private var selectedLocale: Stage16LocalePreset = .english
+    @State private var forceRTL = false
+    @State private var useLongContent = true
+    @State private var showTruncationRisk = false
+
+    private var effectiveDirection: LayoutDirection {
+        forceRTL ? .rightToLeft : layoutDirection
+    }
+
+    private var contentContractPasses: Bool {
+        !(showTruncationRisk && useLongContent)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Picker("Locale preset", selection: $selectedLocale) {
+                ForEach(Stage16LocalePreset.allCases) { preset in
+                    Text(preset.rawValue).tag(preset)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Toggle("Force RTL simulation", isOn: $forceRTL)
+            Toggle("Use long localized content", isOn: $useLongContent)
+            Toggle("Simulate truncation anti-pattern", isOn: $showTruncationRisk)
+
+            LocalizationEnvironmentCard(
+                dynamicTypeSize: dynamicTypeSize,
+                effectiveDirection: effectiveDirection,
+                selectedLocale: selectedLocale,
+                isLongContent: useLongContent
+            )
+
+            LocalizationContractPreviewCard(
+                selectedLocale: selectedLocale,
+                isLongContent: useLongContent,
+                showTruncationRisk: showTruncationRisk
+            )
+            .environment(\.layoutDirection, effectiveDirection)
+
+            DirectionalSymbolContractCard(effectiveDirection: effectiveDirection)
+                .environment(\.layoutDirection, effectiveDirection)
+
+            if contentContractPasses {
+                DSFeedbackBanner(
+                    kind: .success,
+                    title: "Localization contract passes",
+                    message: "Text expansion, directionality, and action affordances remain understandable under this scenario."
+                )
+            } else {
+                DSFeedbackBanner(
+                    kind: .warning,
+                    title: "Localization contract regression",
+                    message: "Expanded text is being truncated by fixed constraints. Replace brittle width assumptions with adaptive layout."
+                )
+            }
+
+            Text("Stage 16 rule: every reusable pattern must survive text expansion, RTL direction changes, and pseudo-localized stress content without semantic loss.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct LocalizationEnvironmentCard: View {
+    let dynamicTypeSize: DynamicTypeSize
+    let effectiveDirection: LayoutDirection
+    let selectedLocale: Stage16LocalePreset
+    let isLongContent: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Localization stress snapshot")
+                .font(.subheadline.weight(.semibold))
+
+            AccessibilityEnvironmentRow(label: "Locale preset", value: selectedLocale.rawValue)
+            AccessibilityEnvironmentRow(label: "Direction", value: effectiveDirection == .rightToLeft ? "RTL" : "LTR")
+            AccessibilityEnvironmentRow(label: "Dynamic Type", value: dynamicTypeDescription)
+            AccessibilityEnvironmentRow(label: "Content mode", value: isLongContent ? "Expanded" : "Compact")
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var dynamicTypeDescription: String {
+        switch dynamicTypeSize {
+        case .xSmall: return "xSmall"
+        case .small: return "small"
+        case .medium: return "medium"
+        case .large: return "large"
+        case .xLarge: return "xLarge"
+        case .xxLarge: return "xxLarge"
+        case .xxxLarge: return "xxxLarge"
+        case .accessibility1: return "accessibility1"
+        case .accessibility2: return "accessibility2"
+        case .accessibility3: return "accessibility3"
+        case .accessibility4: return "accessibility4"
+        case .accessibility5: return "accessibility5"
+        @unknown default: return "unknown"
+        }
+    }
+}
+
+private struct LocalizationContractPreviewCard: View {
+    let selectedLocale: Stage16LocalePreset
+    let isLongContent: Bool
+    let showTruncationRisk: Bool
+
+    private var titleText: String {
+        selectedLocale.sampleTitle
+    }
+
+    private var descriptionText: String {
+        if isLongContent {
+            return selectedLocale.sampleDescription + " " + selectedLocale.sampleDescription
+        }
+        return selectedLocale.sampleDescription
+    }
+
+    var body: some View {
+        DSCard(
+            title: "Localized contract specimen",
+            subtitle: "Adaptive layout should preserve meaning across locale and text-length variance.",
+            footer: "Anti-pattern toggle intentionally applies brittle width and line-limit constraints."
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(titleText)
+                    .font(.headline)
+                    .lineLimit(showTruncationRisk ? 1 : nil)
+
+                Text(descriptionText)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(showTruncationRisk ? 2 : nil)
+
+                HStack(spacing: 8) {
+                    DSStatusBadge(kind: .info, text: selectedLocale.rawValue)
+                    DSButton(selectedLocale.actionTitle, role: .secondary, size: .compact, state: .enabled, action: {})
+                }
+            }
+            .frame(maxWidth: showTruncationRisk ? 250 : .infinity, alignment: .leading)
+        }
+    }
+}
+
+private struct DirectionalSymbolContractCard: View {
+    let effectiveDirection: LayoutDirection
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Directional contract check")
+                .font(.subheadline.weight(.semibold))
+
+            HStack(spacing: 12) {
+                Label("Semantic forward", systemImage: "chevron.forward")
+                Label("Fixed right", systemImage: "arrow.right")
+            }
+            .font(.footnote)
+
+            Text(effectiveDirection == .rightToLeft
+                 ? "RTL active: semantic symbols adapt direction automatically; fixed arrows may communicate the wrong flow."
+                 : "LTR active: both symbols appear aligned, but semantic variants remain safer for bidirectional support.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

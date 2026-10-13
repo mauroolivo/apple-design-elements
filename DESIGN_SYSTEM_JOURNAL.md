@@ -923,3 +923,59 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 15 is complete. Continue only after receiving `next`.
+
+---
+
+## Stage 16 - Localization, RTL, and content stress scenarios
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Validate reusable components against translation and directionality stress so semantic meaning survives text expansion and bidirectional layout changes.
+
+### Apple baseline / reference behavior
+- Source used: SwiftUI layout direction environment semantics.
+- Source used: SwiftUI localization text handling conventions and adaptive text layout behavior.
+- Source used: Stage 6 directional-symbol guidance and Stage 15 accessibility contract framing.
+
+### Design question and prediction
+- Question: Can Stage 13-15 reusable patterns hold semantic clarity under long localized strings and forced RTL direction?
+- Prediction: Yes, if layout remains adaptive and directional semantics are symbol- and contract-driven instead of hard-coded.
+
+### Minimal hands-on implementation
+- Extended `apple-design-elements/PartIIICustomSystemScreen.swift` with Stage 16:
+  - `LocalizationRTLStressSection`
+  - `LocalizationEnvironmentCard`
+  - `LocalizationContractPreviewCard`
+  - `DirectionalSymbolContractCard`
+- Added scenario controls for locale preset, forced RTL, long-content stress, and truncation anti-pattern simulation.
+- Added contract pass/fail feedback so truncation-related meaning loss is surfaced as a system regression.
+- Advanced Part III roadmap to Stage 17.
+
+### Figma/reference comparison or visual inspection
+- Stage 16 remains behavior-focused and does not introduce new Figma-derived numeric assertions.
+- Visual checks are centered on text survivability and directional semantics under stress inputs.
+
+### Accessibility and adaptation checks
+- Localization checks align with accessibility guarantees by preventing semantic loss from truncation.
+- RTL simulation validates directional-symbol choices in addition to text direction flow.
+- Long-copy stress scenarios confirm component slots can expand without collapsing action clarity.
+
+### Trade-offs and design-system rule
+- Trade-off: adaptive layouts can reduce visual compactness in some states but preserve meaning and usability.
+- Rule: translated copy, RTL directionality, and pseudo-localized expansion are first-class contract checks for reusable components.
+
+### Journal entry
+Stage 16 decisions:
+1. Add locale and RTL stress controls directly in Part III.
+2. Treat truncation as a contract regression when meaning is lost.
+3. Re-validate directional icon semantics under forced RTL.
+4. Advance roadmap to motion/timing/interruption behavior after localization stress coverage.
+
+Verification:
+- Stage 16 implementation compiles in the app target after integration.
+- Additional simulator spot-checks should include RTL + accessibility Dynamic Type combinations.
+
+### Stop and wait for `next`
+Stage 16 is complete. Continue only after receiving `next`.
+
