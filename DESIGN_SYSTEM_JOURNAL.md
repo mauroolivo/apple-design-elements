@@ -588,11 +588,31 @@ Introduce a translation contract layer so design-source intent can map to code t
   - `FigmaAccessStatusCard`
   - provisional mapping rows and readiness gates
 - Added `FIGMA_TRANSLATION_CONTRACT.md` with translation schema, provisional mappings, and promotion criteria.
+- Added `figma-export/` workspace folder with exported Figma JSON artifacts:
+  - `file.json`
+  - `styles.json`
+  - `components.json`
+  - `component_sets.json`
+  - `variables_local.json`
 - Updated Part II current rule to include source-traceable translation before external value import.
 
+Figma extraction procedure used (local shell workflow):
+
+```bash
+mkdir -p figma-export
+export FIGMA_TOKEN='PASTE_PERSONAL_ACCESS_TOKEN'
+export FILE_KEY='PASTE_FILE_KEY'
+
+curl -sS -H "X-Figma-Token: $FIGMA_TOKEN" "https://api.figma.com/v1/files/$FILE_KEY" > figma-export/file.json
+curl -sS -H "X-Figma-Token: $FIGMA_TOKEN" "https://api.figma.com/v1/files/$FILE_KEY/styles" > figma-export/styles.json
+curl -sS -H "X-Figma-Token: $FIGMA_TOKEN" "https://api.figma.com/v1/files/$FILE_KEY/components" > figma-export/components.json
+curl -sS -H "X-Figma-Token: $FIGMA_TOKEN" "https://api.figma.com/v1/files/$FILE_KEY/component_sets" > figma-export/component_sets.json
+curl -sS -H "X-Figma-Token: $FIGMA_TOKEN" "https://api.figma.com/v1/files/$FILE_KEY/variables/local" > figma-export/variables_local.json
+```
+
 ### Figma/reference comparison or visual inspection
-- No inspectable official Apple Figma file is currently available in this workspace.
-- Stage 10 therefore operates in provisional mapping mode and explicitly forbids claiming official numeric values.
+- Inspectable Apple Figma metadata exports are now available in `figma-export/` (`file.json`, `styles.json`, `components.json`, `component_sets.json`, `variables_local.json`).
+- Stage 10 remains provisional for numeric-value claims until node-level measurements and variable access are verified; current contract uses traceable metadata and explicit confidence status.
 
 ### Accessibility and adaptation checks
 - Contract fields now require rationale tied to semantic ownership, which helps prevent adaptation regressions during value import.
@@ -612,6 +632,7 @@ Stage 10 decisions:
 Verification:
 - Local build after Stage 10 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
 - Stage 10 specimen now displays provisional mapping rows and readiness gates in Part II.
+- Export verification: `figma-export/` files are present and readable in workspace; key metadata is available through `file.json` for Stage 10/11 mapping.
 
 ### Stop and wait for `next`
 Stage 10 is complete. Continue only after receiving `next`.
