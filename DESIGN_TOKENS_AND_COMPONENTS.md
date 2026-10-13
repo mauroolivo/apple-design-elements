@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 11
+Stage: 12
 Status: Draft v0
 
 ## Purpose
@@ -89,3 +89,9 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Validate component-token geometry contracts (padding, radius, border, spacing) under fixed environment assumptions.
 - Keep mismatch experiments explicit (1-3 pt deltas) and fix at token/component source, not per-screen offsets.
 - Use discrepancy classification before promoting provisional mappings to verified values.
+
+## Stage 12 - Component API implementation
+- Implement `DSButton` as a typed semantic API (`role`, `size`, `state`) instead of independent booleans.
+- Keep visual resolution in one style layer so pressed/disabled/loading behavior remains consistent.
+- Consume token bundle via environment at component level and keep theming at subtree boundary.
+- Treat loading/disabled as explicit state, not incidental modifiers spread across screens.

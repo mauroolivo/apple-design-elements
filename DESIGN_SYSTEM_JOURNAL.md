@@ -692,3 +692,61 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 11 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 12 - Component anatomy and API design
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Design reusable components as semantic contracts with explicit role, size, and state dimensions so invalid combinations are prevented by API shape instead of convention.
+
+### Apple baseline / reference behavior
+- Source used: SwiftUI `Button` behavior and role semantics as the base interaction contract.
+- Source used: previous Stage 5 native-control behavior findings and Stage 9 environment propagation model.
+- Source used: Stage 8 token stack for visual resolution ownership.
+
+### Design question and prediction
+- Question: Can a typed `DSButton` API (`role`, `size`, `state`) reduce ambiguity while preserving native semantics compared with boolean-heavy configuration?
+- Prediction: Yes. Enum-based contracts should constrain invalid combinations and centralize styling/state behavior logic.
+
+### Minimal hands-on implementation
+- Added `apple-design-elements/DSButtonFamily.swift` with:
+  - `DSButtonRole`, `DSButtonSize`, `DSButtonState`
+  - generic `DSButton` component built on native `Button`
+  - `DSButtonVisualStyle` for role/state visual resolution
+  - deterministic `#Preview("DSButton Matrix")`
+- Extended `apple-design-elements/PartIICustomSystemScreen.swift` with Stage 12 section:
+  - `ComponentAnatomySection`
+  - `DSButtonAnatomyCard`
+  - `BooleanExplosionAntiPatternCard`
+- Updated roadmap and current-rule text to reflect Stage 12 completion.
+
+### Figma/reference comparison or visual inspection
+- Stage 12 is API-contract focused and uses Stage 10/11 traceability context rather than direct new geometry extraction.
+- No new official numeric values were claimed from Figma in this stage.
+
+### Accessibility and adaptation checks
+- `DSButton` preserves native control semantics by composing SwiftUI `Button` instead of replacing interaction behavior with gestures.
+- Loading and disabled are explicit states, and state is surfaced through accessibility value text.
+- Component consumes theme tokens from environment, preserving Stage 9 adaptation flow.
+
+### Trade-offs and design-system rule
+- Trade-off: enum-based APIs add upfront type modeling cost, but reduce contradictory configuration and maintenance drift.
+- Rule: shared components expose semantic dimensions as constrained types; avoid independent booleans for mutually exclusive choices.
+
+### Journal entry
+Stage 12 decisions:
+1. Implement first reusable typed component (`DSButton`) on top of native button semantics.
+2. Centralize pressed/disabled/loading visual behavior in one style resolver.
+3. Keep theming boundary at subtree level (`dsTheme`) and token consumption at component level.
+4. Use explicit anti-pattern documentation to reject boolean explosion API designs.
+
+Verification:
+- Local build after Stage 12 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Stage 12 specimen now provides role/size/state controls and a deterministic DSButton matrix preview.
+
+### Stop and wait for `next`
+Stage 12 is complete. Continue only after receiving `next`.

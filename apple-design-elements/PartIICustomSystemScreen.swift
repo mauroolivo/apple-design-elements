@@ -25,8 +25,12 @@ struct PartIICustomSystemScreen: View {
                 VisualFidelityRegressionSection()
             }
 
+            Section("Stage 12 Component Anatomy & API Design") {
+                ComponentAnatomySection()
+            }
+
             Section("Part II Roadmap") {
-                Label("Stage 12 - Component anatomy and API design", systemImage: "square.grid.2x2")
+                Label("Stage 13 - Forms and interactive controls", systemImage: "character.cursor.ibeam")
             }
 
             Section("Baseline Visual Matrix") {
@@ -43,9 +47,112 @@ struct PartIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Model semantic contracts first, keep source traceability, then validate fidelity under a fixed environment matrix with explicit discrepancy classification.")
+                Text("Expose component APIs as semantic role/size/state contracts, avoid boolean-style explosion, and preserve native control semantics under tokenized styling.")
             }
         }
+    }
+}
+
+private struct ComponentAnatomySection: View {
+    @State private var selectedRole: DSButtonRole = .primary
+    @State private var selectedSize: DSButtonSize = .regular
+    @State private var selectedState: DSButtonState = .enabled
+    @State private var tapCount = 0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Picker("Role", selection: $selectedRole) {
+                ForEach(DSButtonRole.allCases) { role in
+                    Text(role.rawValue).tag(role)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Picker("Size", selection: $selectedSize) {
+                ForEach(DSButtonSize.allCases) { size in
+                    Text(size.rawValue).tag(size)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Picker("State", selection: $selectedState) {
+                ForEach(DSButtonState.allCases) { state in
+                    Text(state.rawValue).tag(state)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text("Semantic API-driven DSButton")
+                .font(.headline)
+
+            DSButton(
+                "Apply changes (\(tapCount))",
+                role: selectedRole,
+                size: selectedSize,
+                state: selectedState,
+                action: { tapCount += 1 }
+            )
+            .dsTheme(.ocean)
+
+            DSButtonAnatomyCard(role: selectedRole, size: selectedSize, state: selectedState)
+
+            Divider()
+
+            Text("Boolean explosion anti-pattern")
+                .font(.headline)
+            BooleanExplosionAntiPatternCard()
+
+            Text("Stage 12 rule: model reusable components with semantic enums and explicit states; avoid many independent booleans that create invalid combinations.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct DSButtonAnatomyCard: View {
+    let role: DSButtonRole
+    let size: DSButtonSize
+    let state: DSButtonState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Current contract snapshot")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            Text("Role: \(role.rawValue)")
+                .font(.footnote)
+            Text("Size: \(size.rawValue)")
+                .font(.footnote)
+            Text("State: \(state.rawValue)")
+                .font(.footnote)
+            Text("Slots: label (+ optional loading indicator)")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private struct BooleanExplosionAntiPatternCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("`isPrimary`, `isSecondary`, `isDanger`, `isLarge`, `isCompact`, `isLoading`, `isDisabled`")
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(.secondary)
+
+            Text("Independent booleans create conflicting states (for example, `isPrimary && isSecondary`) and unclear precedence.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
