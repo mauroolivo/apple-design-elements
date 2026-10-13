@@ -1034,3 +1034,61 @@ Verification:
 ### Stop and wait for `next`
 Stage 17 is complete. Continue only after receiving `next`.
 
+---
+
+## Stage 18 - Apple Design Resources JSON integration
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Turn the exported Apple-kit JSON into a practical integration pipeline: inventory -> mapping -> native baseline -> branded system variant -> fidelity classification.
+
+### Apple baseline / reference behavior
+- Source used: Apple Design Resources listing and the accessible Apple community kit export metadata in `figma-export/`.
+- Source used: Apple HIG + SwiftUI native controls to preserve baseline semantic behavior.
+- Source used: existing Stage 10 translation-contract discipline for mapping confidence and provenance.
+
+### Design question and prediction
+- Question: Can exported Apple-kit JSON become actionable integration input rather than passive documentation?
+- Prediction: Yes. A stepwise mapping workflow can connect source names to component contracts and produce measurable fidelity output.
+
+### Minimal hands-on implementation
+- Replaced prior Stage 18 specimen with `Stage18AppleJSONIntegrationSection` in `apple-design-elements/PartIIICustomSystemScreen.swift`:
+  - `Stage18IntegrationStep`
+  - `Stage18JSONSnapshotCard`
+  - `Stage18StepChecklistCard`
+  - `Stage18StepDetailsCard`
+- Added explicit five-step workflow:
+  1. JSON inventory
+  2. token/component mapping
+  3. native baseline composition
+  4. branded custom-system composition
+  5. fidelity log + correction plan
+- Moved Stage 18 into a dedicated Part IV tab and updated stage ownership boundaries.
+
+### Figma/reference comparison or visual inspection
+- Stage 18 now frames reference work as a JSON-driven integration workflow tied to source traceability.
+- Numeric values remain provisional where variable extraction is unavailable (`variables_local.json` unresolved).
+
+### Accessibility and adaptation checks
+- Native baseline step requires preserving platform semantics before customization.
+- Fidelity classification explicitly separates bugs from intended adaptation/customization.
+- Workflow includes stress verification expectations before token promotion.
+
+### Trade-offs and design-system rule
+- Trade-off: integration workflow adds process overhead but prevents untraceable token drift.
+- Rule: source metadata and mapping confidence must be explicit before visual-correction changes.
+
+### Journal entry
+Stage 18 decisions:
+1. Reset Stage 18 to Apple JSON integration scope.
+2. Make stage completion depend on five explicit integration steps.
+3. Keep unresolved JSON-derived values provisional until verified.
+4. Keep follow-up work gated behind explicit Stage 18 deliverable completion.
+
+Verification:
+- Stage 18 reset compiles in app target after replacement.
+- Next step requires producing `STAGE18_APPLE_REFERENCE_SPEC.md` and `STAGE18_FIDELITY_LOG.md` from selected subset execution.
+
+### Stop and wait for `next`
+Stage 18 is complete. Continue only after receiving `next`.

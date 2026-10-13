@@ -12,6 +12,7 @@ private enum LabCoursePart: String, CaseIterable, Identifiable {
     case partI = "Part I"
     case partII = "Part II"
     case partIII = "Part III"
+    case partIV = "Part IV"
 
     var id: String { rawValue }
 }
@@ -45,8 +46,10 @@ struct ContentView: View {
                     PartIFoundationsScreen(assumptions: assumptions)
                 } else if selectedPart == .partII {
                     PartIICustomSystemScreen(assumptions: assumptions)
-                } else {
+                } else if selectedPart == .partIII {
                     PartIIICustomSystemScreen(assumptions: assumptions)
+                } else {
+                    PartIVIntegrationScreen(assumptions: assumptions)
                 }
             }
             .navigationTitle("DesignSystemLab")

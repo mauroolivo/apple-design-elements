@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 17
+Stage: 18
 Status: Draft v0
 
 ## Purpose
@@ -125,4 +125,10 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Respect reduced-motion preferences when transitioning between feedback states.
 - Prevent duplicate or stacked banners/spinners that increase cognitive load and blur state transitions.
 - Treat interruption handling as a first-class reusable behavior contract, not screen-specific glue logic.
+
+## Stage 18 - Apple JSON integration ownership
+- Use exported Apple-kit metadata (`file.json`, `styles.json`, `components.json`, `component_sets.json`) as the traceable source inventory.
+- Map selected source names to semantic/component token paths with explicit confidence (`verified` or `provisional`).
+- Build paired specimens: native-first Apple baseline and branded custom-system variant from the same mapped subset.
+- Record fidelity deltas in stage artifacts before changing tokens or component contracts.
 

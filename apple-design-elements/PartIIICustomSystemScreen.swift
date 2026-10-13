@@ -26,7 +26,7 @@ struct PartIIICustomSystemScreen: View {
             }
 
             Section("Part III Roadmap") {
-                Label("Stage 18 - Data states, skeletons, and empty/error patterns", systemImage: "square.stack.3d.up")
+                Label("Part IV - Stage 18 Apple JSON integration", systemImage: "link")
             }
 
             Section("Baseline Visual Matrix") {
