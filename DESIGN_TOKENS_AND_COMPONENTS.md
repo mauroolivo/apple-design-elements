@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 9
+Stage: 10
 Status: Draft v0
 
 ## Purpose
@@ -71,7 +71,6 @@ Not implemented as public API yet, but the lab is converging on these naming tar
 A reusable component should prefer semantic/component tokens over direct raw values. Raw values remain acceptable only when the scope is local, explicit, and intentionally non-shared.
 
 ## Next-stage considerations
-- Stage 10: Figma-to-token mapping contract
 - Stage 12+: turn stable tokenized specimens into reusable component APIs
 
 ## Stage 9 - Theme resolution and propagation
@@ -79,3 +78,8 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Resolve one `DSTokenBundle` from that boundary and inject it via `EnvironmentValues.dsTokens`.
 - Consume tokens in leaf components with `@Environment(\.dsTokens)` to reduce API coupling and manual threading.
 - Keep anti-pattern reference: manually passing `tokenBundle` through non-owning layers (prop drilling).
+
+## Stage 10 - Translation contract and provenance
+- Add `FIGMA_TRANSLATION_CONTRACT.md` as the audit artifact for source-to-token mapping.
+- Every mapping records source target, token path, evidence rationale, and status (`Provisional` or `Verified`).
+- Promote mappings to `Verified` only after inspectable source metadata and simulator/accessibility checks are attached.

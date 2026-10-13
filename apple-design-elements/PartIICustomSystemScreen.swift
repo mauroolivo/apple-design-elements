@@ -17,8 +17,11 @@ struct PartIICustomSystemScreen: View {
                 ThemePropagationSection()
             }
 
+            Section("Stage 10 Figma Translation Contract") {
+                FigmaTranslationContractSection()
+            }
+
             Section("Part II Roadmap") {
-                Label("Stage 10 - Figma translation contract", systemImage: "square.and.pencil")
                 Label("Stage 11 - Visual fidelity and regression", systemImage: "photo.on.rectangle")
             }
 
@@ -36,9 +39,102 @@ struct PartIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Model primitive, semantic, and component tokens separately, then resolve theme variants through environment propagation so shared UI adapts without prop drilling.")
+                Text("Model primitive, semantic, and component tokens separately, resolve theme variants through environment propagation, and keep a source-traceable translation contract before importing external design values.")
             }
         }
+    }
+}
+
+private struct FigmaTranslationContractSection: View {
+    private let mappings: [FigmaContractMapping] = [
+        .init(figmaTarget: "Button / Primary / Container fill", tokenPath: "components.button.background", evidence: "Brand accent semantic action", status: "Provisional"),
+        .init(figmaTarget: "Button / Primary / Label color", tokenPath: "components.button.foreground", evidence: "On-accent text role", status: "Provisional"),
+        .init(figmaTarget: "Card / Surface fill", tokenPath: "components.card.background", evidence: "Semantic surface primary", status: "Provisional"),
+        .init(figmaTarget: "Card / Border", tokenPath: "components.card.border + borderWidth", evidence: "Semantic subtle border", status: "Provisional"),
+        .init(figmaTarget: "Badge / Pill background", tokenPath: "components.badge.background", evidence: "Semantic accent surface", status: "Provisional")
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            FigmaAccessStatusCard()
+
+            Divider()
+
+            Text("Provisional translation table")
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(mappings) { mapping in
+                    FigmaContractMappingRow(mapping: mapping)
+                }
+            }
+
+            Divider()
+
+            Text("Readiness gates")
+                .font(.headline)
+            Label("Do not claim official values without inspectable source metadata", systemImage: "checkmark.circle")
+                .font(.footnote)
+            Label("Record token path + rationale for every imported value", systemImage: "checkmark.circle")
+                .font(.footnote)
+            Label("Flag unresolved mappings as provisional until verified", systemImage: "checkmark.circle")
+                .font(.footnote)
+
+            Text("Stage 10 rule: translation from design source to code tokens must remain auditable, versioned, and explicit about confidence level.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct FigmaAccessStatusCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Source availability")
+                .font(.subheadline.weight(.semibold))
+            Label("No inspectable Figma file/session is currently available", systemImage: "exclamationmark.triangle")
+                .font(.footnote)
+            Text("Contract remains in provisional mode: map intent to token paths now, then attach exact Figma node metadata once access exists.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private struct FigmaContractMapping: Identifiable {
+    let id = UUID()
+    let figmaTarget: String
+    let tokenPath: String
+    let evidence: String
+    let status: String
+}
+
+private struct FigmaContractMappingRow: View {
+    let mapping: FigmaContractMapping
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(mapping.figmaTarget)
+                .font(.footnote.weight(.semibold))
+            Text("Token: \(mapping.tokenPath)")
+                .font(.system(.caption, design: .monospaced))
+            Text("Evidence: \(mapping.evidence)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text("Status: \(mapping.status)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
 

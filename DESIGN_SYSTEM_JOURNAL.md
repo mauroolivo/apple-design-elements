@@ -562,3 +562,56 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 9 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 10 - Figma translation contract and traceability
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Introduce a translation contract layer so design-source intent can map to code token paths with explicit provenance and confidence, even when inspectable Figma values are not yet available.
+
+### Apple baseline / reference behavior
+- Source used: Apple Design Resources listing as the authoritative index for official kit presence.
+- Source used: prior Stage 8/9 token architecture (`primitive -> semantic -> component`, environment propagation).
+- Source used: project public-safe policy requiring source traceability and non-redistribution by default.
+
+### Design question and prediction
+- Question: Can we define a robust source-to-token contract before inspectable Figma access exists?
+- Prediction: Yes, by making mappings provisional with explicit evidence fields and promotion gates to verified status.
+
+### Minimal hands-on implementation
+- Added Stage 10 UI section in `apple-design-elements/PartIICustomSystemScreen.swift`:
+  - `FigmaTranslationContractSection`
+  - `FigmaAccessStatusCard`
+  - provisional mapping rows and readiness gates
+- Added `FIGMA_TRANSLATION_CONTRACT.md` with translation schema, provisional mappings, and promotion criteria.
+- Updated Part II current rule to include source-traceable translation before external value import.
+
+### Figma/reference comparison or visual inspection
+- No inspectable official Apple Figma file is currently available in this workspace.
+- Stage 10 therefore operates in provisional mapping mode and explicitly forbids claiming official numeric values.
+
+### Accessibility and adaptation checks
+- Contract fields now require rationale tied to semantic ownership, which helps prevent adaptation regressions during value import.
+- Promotion gates include simulator matrix and accessibility checks before a mapping can be marked verified.
+
+### Trade-offs and design-system rule
+- Trade-off: contract documentation adds process overhead, but prevents silent drift and unverifiable token imports.
+- Rule: every external design value must enter through a traceable mapping record with status (`Provisional`/`Verified`).
+
+### Journal entry
+Stage 10 decisions:
+1. Establish a standalone translation contract artifact for source-to-token traceability.
+2. Keep all current mappings provisional until inspectable source metadata is attached.
+3. Require token-path attribution for each imported design value.
+4. Attach accessibility/adaptation verification before status promotion to verified.
+
+Verification:
+- Local build after Stage 10 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Stage 10 specimen now displays provisional mapping rows and readiness gates in Part II.
+
+### Stop and wait for `next`
+Stage 10 is complete. Continue only after receiving `next`.
