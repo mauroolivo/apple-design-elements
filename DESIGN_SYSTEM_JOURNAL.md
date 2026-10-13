@@ -807,3 +807,61 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 13 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 14 - Composed components and consistency
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Build higher-level composed patterns from shared foundations so cards, rows, headers, badges, and feedback elements read as one system instead of a set of visually similar one-offs.
+
+### Apple baseline / reference behavior
+- Source used: SwiftUI `List`/row semantics and label/icon composition conventions from Apple docs.
+- Source used: earlier stage control and token contracts for behavior and styling continuity.
+- Source used: prior card/button/field components as the reusable foundation layer.
+
+### Design question and prediction
+- Question: Can a composed pattern built from shared foundations maintain consistency better than a version recreated with duplicated spacing/radius values?
+- Prediction: Yes. A shared foundation should reduce drift and make the maintenance cost of one-off composition obvious.
+
+### Minimal hands-on implementation
+- Added `apple-design-elements/DSComposedComponents.swift` with:
+  - `DSCard`
+  - `DSSectionHeader`
+  - `DSListRow`
+  - `DSStatusBadge`
+  - `DSFeedbackBanner`
+- Extended `apple-design-elements/PartIICustomSystemScreen.swift` with Stage 14 section:
+  - `ComposedComponentsConsistencySection`
+  - `DSConsistencyComparisonCard`
+  - toggle-driven detail row comparison
+- Updated roadmap to Stage 15 and revised current-rule text for shared-foundation composition.
+
+### Figma/reference comparison or visual inspection
+- Stage 14 is composition-focused and relies on prior traceability/fidelity scaffolding.
+- No new Figma numeric claims were introduced; the emphasis is consistency across reused patterns.
+
+### Accessibility and adaptation checks
+- Composed patterns preserve semantic text/icon relationships and keep components readable across content changes.
+- Shared status/feedback components provide explicit state cues instead of relying on color alone.
+
+### Trade-offs and design-system rule
+- Trade-off: introducing another composition layer adds API surface, but it makes ownership and drift easier to see.
+- Rule: keep component-local tokens distinct from screen layout decisions and prefer shared foundations over copied magic numbers.
+
+### Journal entry
+Stage 14 decisions:
+1. Introduce reusable composed patterns for cards, rows, headers, badges, and feedback.
+2. Compare tokenized composition against duplicated-number composition to surface drift.
+3. Keep action/feedback/status semantics explicit so composed content remains understandable.
+4. Advance the roadmap to accessibility guarantees after stabilizing composition patterns.
+
+Verification:
+- Local build after Stage 14 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Stage 14 specimen now includes shared composed components and a consistency comparison card.
+
+### Stop and wait for `next`
+Stage 14 is complete. Continue only after receiving `next`.

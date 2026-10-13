@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 13
+Stage: 14
 Status: Draft v0
 
 ## Purpose
@@ -101,3 +101,9 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Model validation states explicitly (`normal`, `focused`, `disabled`, `error`) so helper/error rendering remains deterministic.
 - Preserve focus and keyboard behavior via SwiftUI focus APIs rather than custom gesture plumbing.
 - Group controls and action affordances into a card-level form pattern to clarify ownership and hierarchy.
+
+## Stage 14 - Composed component ownership
+- Add composed primitives like cards, rows, section headers, status badges, and feedback banners as reusable patterns.
+- Keep layout choices close to the consumer screen while reusable parts own their local token mapping.
+- Use a shared surface/spacing system so composed components stay visually consistent across contexts.
+- Compare a semantic-token composition against a duplicated-number composition to reveal maintenance drift.

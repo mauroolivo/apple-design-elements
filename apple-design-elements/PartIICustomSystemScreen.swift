@@ -33,8 +33,12 @@ struct PartIICustomSystemScreen: View {
                 FormsAndInteractiveControlsSection()
             }
 
+            Section("Stage 14 Composed Components & Consistency") {
+                ComposedComponentsConsistencySection()
+            }
+
             Section("Part II Roadmap") {
-                Label("Stage 14 - Composed components and consistency", systemImage: "rectangle.stack")
+                Label("Stage 15 - Accessibility as a design-system guarantee", systemImage: "accessibility")
             }
 
             Section("Baseline Visual Matrix") {
@@ -51,9 +55,77 @@ struct PartIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Expose component APIs as semantic role/size/state contracts, group related inputs coherently, and preserve native editing/selection behavior under tokenized styling.")
+                Text("Compose cards, rows, headers, badges, and feedback from shared foundations; avoid duplicating magic numbers when semantic tokens can express intent.")
             }
         }
+    }
+}
+
+private struct ComposedComponentsConsistencySection: View {
+    @State private var showingDetails = true
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Toggle("Show detail rows", isOn: $showingDetails)
+
+            DSSectionHeader(
+                title: "Library overview",
+                subtitle: "Shared foundations reused across cards, rows, headers, badges, and feedback",
+                actionTitle: "Refresh",
+                action: {}
+            )
+
+            DSCard(
+                title: "Composed components built from shared primitives",
+                subtitle: "The same spacing, text roles, and surface tokens should appear consistently across patterns.",
+                footer: "Consistency comes from shared ownership, not from copying values between screens."
+            ) {
+                VStack(alignment: .leading, spacing: 8) {
+                    DSListRow(symbolName: "rectangle.grid.2x2.fill", title: "Cards", subtitle: "Structural containers with content slots", trailingText: "4")
+                    if showingDetails {
+                        DSListRow(symbolName: "text.alignleft", title: "Section headers", subtitle: "Titles, subtitles, and optional actions", trailingText: "2")
+                        DSListRow(symbolName: "bell.badge.fill", title: "Feedback", subtitle: "State banners and status badges", trailingText: "3")
+                    }
+                    DSListRow(symbolName: "seal.fill", title: "Status badges", subtitle: "Compact semantic indicators", trailingText: "6", showsChevron: true)
+                }
+            }
+
+            DSFeedbackBanner(
+                kind: .info,
+                title: "Shared foundation check",
+                message: "Cards, rows, and feedback elements should read as one system even when their local jobs differ."
+            )
+
+            DSConsistencyComparisonCard()
+
+            Text("Stage 14 rule: keep component-local tokens separate from layout decisions, and compare a tokenized composition against a duplicated-magic-number version before promoting the pattern.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct DSConsistencyComparisonCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Comparison: shared foundation vs duplicated numbers")
+                .font(.subheadline.weight(.semibold))
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Shared foundation: one token set for spacing, borders, and surfaces.")
+                Text("Duplicated numbers: each screen redefines the same paddings and radii, increasing drift risk.")
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+
+            HStack(spacing: 8) {
+                DSStatusBadge(kind: .success, text: "Consistent")
+                DSStatusBadge(kind: .warning, text: "Drift risk")
+            }
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
