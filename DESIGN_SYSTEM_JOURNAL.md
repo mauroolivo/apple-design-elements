@@ -636,3 +636,59 @@ Verification:
 
 ### Stop and wait for `next`
 Stage 10 is complete. Continue only after receiving `next`.
+
+
+---
+
+## Stage 11 - Pixel-accurate validation and visual regression
+
+Date: 2026-10-13
+
+### Goal and design-system mental model
+Validate tokenized UI against a fixed reference matrix and classify discrepancies before changing tokens, so fidelity work improves contracts instead of adding one-off layout patches.
+
+### Apple baseline / reference behavior
+- Source used: official Apple kit metadata exported to `figma-export/file.json` and companion endpoint outputs.
+- Source used: Apple HIG and SwiftUI semantics from previous stages as adaptation baseline.
+- Source used: Stage 10 translation contract as the provenance backbone for value checks.
+
+### Design question and prediction
+- Question: Can we reliably detect and correct 1-3 pt geometry regressions with a repeatable matrix and discrepancy taxonomy?
+- Prediction: Yes. Explicit reference values and classification rules should surface regressions quickly and prevent ad-hoc fixes.
+
+### Minimal hands-on implementation
+- Added Stage 11 lab section in `apple-design-elements/PartIICustomSystemScreen.swift`:
+  - `VisualFidelityRegressionSection`
+  - `FigmaMetadataSnapshotCard`
+  - `FidelityReferenceCard`
+  - `FidelityImplementationCard` with a deliberate 1-3 pt mismatch toggle
+  - `FidelityMeasurementTable` and row-level pass/fail indicators
+- Added `FIGMA_TO_SWIFTUI_FIDELITY_CHECKLIST.md` with baseline environment, comparison workflow, discrepancy categories, and acceptance criteria.
+- Updated Stage 10 source-availability card copy to reflect metadata-export availability and remaining measurement caveats.
+
+### Figma/reference comparison or visual inspection
+- Metadata snapshot from `figma-export/file.json`: 46 pages, 1506 components, 223 component sets, 86 styles.
+- Sample inspectable references include pages (`Cover`, `Colors`, `Materials`, `Text Styles and Dynamic Type`) and named styles (`XLTitle1`, `Colors/Gray`, `Body/Regular`).
+- Variable endpoint access remains restricted in current export (`variables_local.json` status indicates unresolved access), so exact variable-backed value extraction stays partial.
+
+### Accessibility and adaptation checks
+- Stage 11 preserves the prior environment matrix (appearance, Dynamic Type, locale, direction) and keeps adaptation-aware classification separate from geometry bugs.
+- Fidelity checks prioritize geometry and token ownership, while expected dynamic rendering differences are documented as adaptation behavior, not regressions.
+
+### Trade-offs and design-system rule
+- Trade-off: detailed discrepancy logging adds review overhead, but prevents token drift and cosmetic patching.
+- Rule: fix fidelity deltas at token/component contract level; do not introduce per-screen compensation values for reusable UI.
+
+### Journal entry
+Stage 11 decisions:
+1. Introduce a dedicated fidelity checklist artifact before adding visual regression automation.
+2. Keep mismatch experiments deliberate and measurable (+/- 1-3 pt) to validate detection discipline.
+3. Separate adaptation differences from true regressions using explicit discrepancy classes.
+4. Promote Stage 10 mapping confidence only when source metadata and measurement evidence both exist.
+
+Verification:
+- Local build after Stage 11 changes succeeded for iOS simulator target (`iPhone 18 Pro`, iOS 27.0).
+- Stage 11 specimen now exposes a live mismatch toggle and measured row-level discrepancy output.
+
+### Stop and wait for `next`
+Stage 11 is complete. Continue only after receiving `next`.

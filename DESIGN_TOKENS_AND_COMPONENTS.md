@@ -1,7 +1,7 @@
 # Design Tokens and Components
 
 Last updated: 2026-10-13
-Stage: 10
+Stage: 11
 Status: Draft v0
 
 ## Purpose
@@ -83,3 +83,9 @@ A reusable component should prefer semantic/component tokens over direct raw val
 - Add `FIGMA_TRANSLATION_CONTRACT.md` as the audit artifact for source-to-token mapping.
 - Every mapping records source target, token path, evidence rationale, and status (`Provisional` or `Verified`).
 - Promote mappings to `Verified` only after inspectable source metadata and simulator/accessibility checks are attached.
+
+## Stage 11 - Fidelity validation ownership
+- Add `FIGMA_TO_SWIFTUI_FIDELITY_CHECKLIST.md` as the baseline validation protocol.
+- Validate component-token geometry contracts (padding, radius, border, spacing) under fixed environment assumptions.
+- Keep mismatch experiments explicit (1-3 pt deltas) and fix at token/component source, not per-screen offsets.
+- Use discrepancy classification before promoting provisional mappings to verified values.

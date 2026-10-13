@@ -21,8 +21,12 @@ struct PartIICustomSystemScreen: View {
                 FigmaTranslationContractSection()
             }
 
+            Section("Stage 11 Visual Fidelity & Regression") {
+                VisualFidelityRegressionSection()
+            }
+
             Section("Part II Roadmap") {
-                Label("Stage 11 - Visual fidelity and regression", systemImage: "photo.on.rectangle")
+                Label("Stage 12 - Component anatomy and API design", systemImage: "square.grid.2x2")
             }
 
             Section("Baseline Visual Matrix") {
@@ -39,8 +43,168 @@ struct PartIICustomSystemScreen: View {
             }
 
             Section("Current Rule") {
-                Text("Model primitive, semantic, and component tokens separately, resolve theme variants through environment propagation, and keep a source-traceable translation contract before importing external design values.")
+                Text("Model semantic contracts first, keep source traceability, then validate fidelity under a fixed environment matrix with explicit discrepancy classification.")
             }
+        }
+    }
+}
+
+private struct VisualFidelityRegressionSection: View {
+    @State private var introduceMismatch = true
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            FigmaMetadataSnapshotCard()
+
+            Toggle("Introduce 1-3 pt mismatch", isOn: $introduceMismatch)
+
+            Text("Reference vs implementation comparison")
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 12) {
+                FidelityReferenceCard()
+                FidelityImplementationCard(isMismatched: introduceMismatch)
+            }
+
+            FidelityMeasurementTable(isMismatched: introduceMismatch)
+
+            Text("Classification rule: treat measurable geometry deltas as implementation bugs first; keep dynamic rendering differences in a separate adaptation bucket.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct FigmaMetadataSnapshotCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Inspectable source snapshot")
+                .font(.subheadline.weight(.semibold))
+
+            FidelityMetricRow(label: "Kit", value: "iOS and iPadOS 27 (Community)")
+            FidelityMetricRow(label: "Pages", value: "46")
+            FidelityMetricRow(label: "Components", value: "1506")
+            FidelityMetricRow(label: "Component sets", value: "223")
+            FidelityMetricRow(label: "Styles", value: "86")
+
+            Text("Counts are captured from `figma-export/file.json` and used as Stage 11 traceability evidence.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct FidelityMetricRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 12)
+            Text(value)
+                .fontWeight(.medium)
+        }
+        .font(.footnote)
+    }
+}
+
+private struct FidelityReferenceCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Reference spec (course-authored, traceable)")
+                .font(.subheadline.weight(.semibold))
+            Text("Padding 16 pt, radius 14 pt, border 1 pt")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text("Primary action")
+                .font(.footnote.weight(.semibold))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(Color.blue, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .foregroundStyle(.white)
+        }
+        .padding(16)
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
+    }
+}
+
+private struct FidelityImplementationCard: View {
+    let isMismatched: Bool
+
+    private var outerPadding: CGFloat { isMismatched ? 18 : 16 }
+    private var cornerRadius: CGFloat { isMismatched ? 13 : 14 }
+    private var borderWidth: CGFloat { isMismatched ? 2 : 1 }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Implementation sample")
+                .font(.subheadline.weight(.semibold))
+            Text(isMismatched ? "Deliberate deltas: +2 pt padding, -1 pt radius, +1 pt border" : "Aligned to reference values")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text("Primary action")
+                .font(.footnote.weight(.semibold))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(Color.blue, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .foregroundStyle(.white)
+        }
+        .padding(outerPadding)
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .stroke(Color(uiColor: .separator), lineWidth: borderWidth)
+        )
+    }
+}
+
+private struct FidelityMeasurementTable: View {
+    let isMismatched: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Measured discrepancy log")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            FidelityCheckRow(label: "Container padding", expected: "16", actual: isMismatched ? "18" : "16")
+            FidelityCheckRow(label: "Corner radius", expected: "14", actual: isMismatched ? "13" : "14")
+            FidelityCheckRow(label: "Border width", expected: "1", actual: isMismatched ? "2" : "1")
+        }
+    }
+}
+
+private struct FidelityCheckRow: View {
+    let label: String
+    let expected: String
+    let actual: String
+
+    private var isMatching: Bool { expected == actual }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: isMatching ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .foregroundStyle(isMatching ? .green : .orange)
+
+            Text(label)
+                .font(.footnote)
+
+            Spacer(minLength: 8)
+
+            Text("exp \(expected) / act \(actual)")
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(.secondary)
         }
     }
 }
@@ -93,9 +257,9 @@ private struct FigmaAccessStatusCard: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Source availability")
                 .font(.subheadline.weight(.semibold))
-            Label("No inspectable Figma file/session is currently available", systemImage: "exclamationmark.triangle")
+            Label("Metadata exports are available in figma-export/", systemImage: "checkmark.circle")
                 .font(.footnote)
-            Text("Contract remains in provisional mode: map intent to token paths now, then attach exact Figma node metadata once access exists.")
+            Text("Contract remains provisional for exact measurements until node-level geometry and variable access are fully verified.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
