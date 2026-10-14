@@ -8,7 +8,6 @@
 
 /* Begin PBXFileReference section */
 		346252ED307A3E8C0050E5CF /* apple-design-elements.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "apple-design-elements.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		346252FB307A3ED10050E5CF /* _UI_MATTERS_VISION_MISSION.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = _UI_MATTERS_VISION_MISSION.md; sourceTree = "<group>"; };
 		346252FC307A3ED10050E5CF /* APPLE_DESIGN_SYSTEM_DEEP_DIVE_APPLE_RESOURCES_ONLY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = APPLE_DESIGN_SYSTEM_DEEP_DIVE_APPLE_RESOURCES_ONLY.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -33,7 +32,6 @@
 			isa = PBXGroup;
 			children = (
 				346252FC307A3ED10050E5CF /* APPLE_DESIGN_SYSTEM_DEEP_DIVE_APPLE_RESOURCES_ONLY.md */,
-				346252FB307A3ED10050E5CF /* _UI_MATTERS_VISION_MISSION.md */,
 				346252EF307A3E8C0050E5CF /* apple-design-elements */,
 				346252EE307A3E8C0050E5CF /* Products */,
 			);
